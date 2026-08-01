@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from './lib/supabase';
 import {
   NavigationTab,
   User,
@@ -234,6 +235,42 @@ export default function App() {
       }
     };
     loadSupabaseData();
+  }, []);
+
+  // Supabase Real-time Subscription for Forum Topics & Comments (Live Updates Like WhatsApp!)
+  useEffect(() => {
+    const handleRealtimeUpdate = async () => {
+      try {
+        const latestTopics = await getForumTopicsFromSupabase();
+        if (latestTopics && latestTopics.length > 0) {
+          setForumTopics(latestTopics);
+        }
+      } catch (e) {
+        console.warn('Realtime fetch warning:', e);
+      }
+    };
+
+    const forumChannel = supabase
+      .channel('public_realtime_forum')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'forum_topics' },
+        () => {
+          handleRealtimeUpdate();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'forum_comments' },
+        () => {
+          handleRealtimeUpdate();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(forumChannel);
+    };
   }, []);
 
 
