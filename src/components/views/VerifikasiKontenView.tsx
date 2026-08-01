@@ -179,12 +179,18 @@ export const VerifikasiKontenView: React.FC<VerifikasiKontenViewProps> = ({
                     onClick={() => setSelectedId(doc.id)}
                     className={`p-3.5 rounded-xl cursor-pointer transition-all border ${
                       isSelected
-                        ? 'bg-sky-50/90 border-[#006194] shadow-sm'
-                        : 'bg-white border-transparent hover:bg-slate-50 hover:border-slate-200'
+                        ? 'bg-sky-50 border-2 border-[#006194] shadow-sm'
+                        : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-700/60'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded tracking-wider bg-sky-100 text-[#006194]">
+                      <span
+                        className={`text-[10px] font-extrabold px-2 py-0.5 rounded tracking-wider ${
+                          isSelected
+                            ? 'bg-[#006194] text-white shadow-2xs'
+                            : 'bg-sky-100 dark:bg-sky-950/80 text-[#006194] dark:text-sky-300'
+                        }`}
+                      >
                         {doc.category}
                       </span>
                       <span
@@ -200,15 +206,29 @@ export const VerifikasiKontenView: React.FC<VerifikasiKontenViewProps> = ({
                       </span>
                     </div>
 
-                    <h4 className="font-bold text-slate-900 text-xs leading-snug line-clamp-2 mb-1">
+                    <h4
+                      className={`font-bold text-xs leading-snug line-clamp-2 mb-1 ${
+                        isSelected ? 'text-slate-900' : 'text-slate-900 dark:text-white'
+                      }`}
+                    >
                       {doc.title}
                     </h4>
 
-                    <div className="flex items-center justify-between text-[11px] text-slate-500 mt-2">
-                      <span className="font-semibold text-slate-700 truncate max-w-[140px]">
+                    <div className="flex items-center justify-between text-[11px] mt-2">
+                      <span
+                        className={`font-semibold truncate max-w-[140px] ${
+                          isSelected ? 'text-slate-800' : 'text-slate-700 dark:text-slate-300'
+                        }`}
+                      >
                         👤 {doc.author}
                       </span>
-                      <span>{doc.submitDate}</span>
+                      <span
+                        className={`font-medium ${
+                          isSelected ? 'text-slate-600' : 'text-slate-500 dark:text-slate-400'
+                        }`}
+                      >
+                        {doc.submitDate}
+                      </span>
                     </div>
                   </div>
                 );

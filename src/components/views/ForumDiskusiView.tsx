@@ -690,26 +690,50 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                     onClick={() => setSelectedTopicId(topic.id)}
                     className={`p-4 rounded-xl border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-sky-50/80 border-[#006194] shadow-sm'
-                        : 'bg-white border-slate-200 hover:bg-slate-50'
+                        ? 'bg-sky-50 border-2 border-[#006194] shadow-sm'
+                        : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-700/60'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold text-[#006194] bg-sky-100 px-2 py-0.5 rounded">
+                      <span
+                        className={`text-[10px] font-extrabold px-2 py-0.5 rounded ${
+                          isSelected
+                            ? 'bg-[#006194] text-white shadow-2xs'
+                            : 'bg-sky-100 dark:bg-sky-950/80 text-[#006194] dark:text-sky-300'
+                        }`}
+                      >
                         {topic.category}
                       </span>
-                      <span className="text-[10px] text-slate-400">{topic.date}</span>
+                      <span
+                        className={`text-[10px] font-medium ${
+                          isSelected ? 'text-slate-600' : 'text-slate-400 dark:text-slate-500'
+                        }`}
+                      >
+                        {topic.date}
+                      </span>
                     </div>
 
-                    <h4 className="font-bold text-slate-900 text-sm line-clamp-2 leading-snug">
+                    <h4
+                      className={`font-bold text-sm line-clamp-2 leading-snug ${
+                        isSelected ? 'text-slate-900' : 'text-slate-900 dark:text-white'
+                      }`}
+                    >
                       {topic.title}
                     </h4>
 
-                    <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
-                      <span className="font-semibold text-slate-700 truncate max-w-[140px]">
+                    <div className="mt-3 flex items-center justify-between text-xs">
+                      <span
+                        className={`font-semibold truncate max-w-[140px] ${
+                          isSelected ? 'text-slate-800' : 'text-slate-700 dark:text-slate-300'
+                        }`}
+                      >
                         {topic.author}
                       </span>
-                      <span className="flex items-center gap-1 font-bold text-[#006194]">
+                      <span
+                        className={`flex items-center gap-1 font-extrabold ${
+                          isSelected ? 'text-[#006194]' : 'text-[#006194] dark:text-sky-400'
+                        }`}
+                      >
                         <span className="material-symbols-outlined text-[16px]">chat_bubble</span>
                         <span>{topic.comments ? topic.comments.length : 0} Balasan</span>
                       </span>
