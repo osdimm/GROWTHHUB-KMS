@@ -290,12 +290,17 @@ export default function App() {
     loadSupabaseData();
   }, []);
 
-  // State for Realtime Reply Notification Popup Alert
+  // State for Realtime Reply Notification Popup Alert & Navigation Highlight Target
   const [replyNotificationPopup, setReplyNotificationPopup] = useState<{
+    topicId: string;
+    commentId: string;
     targetAuthor: string;
     senderName: string;
     message: string;
   } | null>(null);
+
+  const [targetForumTopicId, setTargetForumTopicId] = useState<string | null>(null);
+  const [targetHighlightCommentId, setTargetHighlightCommentId] = useState<string | null>(null);
 
   const checkAndShowReplyPopup = (newComment: any, topicsList: ForumTopic[]) => {
     if (!newComment) return;
@@ -306,19 +311,22 @@ export default function App() {
     // 3a. Only process if parentId exists (it's a reply to a comment)
     if (!parentId) return;
 
-    // 3b. Find parent comment in topicsList or current state
+    // 3b. Find parent comment and its parent topic in topicsList
     let parentComment: ForumComment | undefined;
+    let foundTopicId: string | undefined;
+
     for (const topic of topicsList) {
       if (topic.comments) {
         const found = topic.comments.find((c: any) => c.id === parentId);
         if (found) {
           parentComment = found;
+          foundTopicId = topic.id;
           break;
         }
       }
     }
 
-    if (!parentComment) return;
+    if (!parentComment || !foundTopicId) return;
 
     const targetAuthor = parentComment.author;
     const loggedInUser = users.find((u) => u.id === currentUserId);
@@ -333,6 +341,8 @@ export default function App() {
       commentAuthor.toLowerCase() !== loggedInUserName.toLowerCase()
     ) {
       setReplyNotificationPopup({
+        topicId: foundTopicId,
+        commentId: newComment.id,
         targetAuthor,
         senderName: commentAuthor,
         message: newComment.content || ''
@@ -343,6 +353,16 @@ export default function App() {
         setReplyNotificationPopup(null);
       }, 6000);
     }
+  };
+
+  // Handler for clicking the notification popup: navigate to forum, set topic, scroll & highlight target comment
+  const handleNotificationPopupClick = () => {
+    if (!replyNotificationPopup) return;
+
+    setActiveTab('forum-diskusi');
+    setTargetForumTopicId(replyNotificationPopup.topicId);
+    setTargetHighlightCommentId(replyNotificationPopup.commentId);
+    setReplyNotificationPopup(null);
   };
 
   // Supabase Real-time Subscription for Forum Topics & Comments (Live Updates Lintas Session!)
@@ -1083,6 +1103,8 @@ export default function App() {
                 currentUserRole={currentUser.role}
                 currentUserName={currentUser.name}
                 currentUserId={currentUser.id}
+                targetTopicId={targetForumTopicId}
+                targetHighlightCommentId={targetHighlightCommentId}
               />
             )}
 
@@ -1156,9 +1178,12 @@ export default function App() {
         </div>
       )}
 
-      {/* Realtime Instant Reply Notification Popup Alert (Cross-Session / Multi-Device) */}
+      {/* Realtime Instant Reply Notification Popup Alert (Mobile & Desktop Safe z-[9999]) */}
       {replyNotificationPopup && (
-        <div className="fixed top-6 right-6 z-50 max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl dark:shadow-cyan-950/40 p-4 space-y-3 animate-in slide-in-from-top-5 duration-200">
+        <div
+          onClick={handleNotificationPopupClick}
+          className="fixed top-4 right-4 left-4 sm:left-auto sm:w-96 z-[9999] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl dark:shadow-cyan-950/40 p-4 space-y-3 animate-in slide-in-from-top-5 duration-200 cursor-pointer hover:border-[#006194] dark:hover:border-cyan-400 transition-all"
+        >
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
             <div className="flex items-center gap-2 text-[#006194] dark:text-cyan-400 font-extrabold text-xs">
               <span className="material-symbols-outlined text-lg">question_answer</span>
@@ -1166,8 +1191,12 @@ export default function App() {
             </div>
             <button
               type="button"
-              onClick={() => setReplyNotificationPopup(null)}
-              className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 p-0.5 rounded-lg transition-colors cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                setReplyNotificationPopup(null);
+              }}
+              className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-lg transition-colors cursor-pointer"
+              title="Tutup Notifikasi"
             >
               <span className="material-symbols-outlined text-sm">close</span>
             </button>
@@ -1180,6 +1209,10 @@ export default function App() {
             <div className="p-3 bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed shadow-sm">
               {replyNotificationPopup.message}
             </div>
+            <p className="text-[10px] text-[#006194] dark:text-cyan-400 font-bold text-right hover:underline pt-1 flex items-center justify-end gap-1">
+              <span>Klik untuk melihat balasan</span>
+              <span className="material-symbols-outlined text-[12px]">arrow_forward</span>
+            </p>
           </div>
         </div>
       )}

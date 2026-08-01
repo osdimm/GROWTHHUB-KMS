@@ -13,6 +13,8 @@ interface ForumDiskusiViewProps {
   currentUserRole?: string;
   currentUserName?: string;
   currentUserId?: string;
+  targetTopicId?: string | null;
+  targetHighlightCommentId?: string | null;
 }
 
 interface CommentTreeNode extends ForumComment {
@@ -109,6 +111,7 @@ interface CommentNodeItemProps {
   activeReplyId: string | null;
   inlineReplyText: string;
   collapsedSet: Set<string>;
+  targetHighlightCommentId?: string | null;
   onToggleReply: (commentId: string, authorName: string) => void;
   onCancelReply: () => void;
   onChangeInlineText: (text: string) => void;
@@ -127,6 +130,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
   activeReplyId,
   inlineReplyText,
   collapsedSet,
+  targetHighlightCommentId,
   onToggleReply,
   onCancelReply,
   onChangeInlineText,
@@ -138,6 +142,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
   const isCollapsed = collapsedSet.has(node.id);
   const isReplyingThis = activeReplyId === node.id;
   const isDeleted = node.content === '[Komentar telah dihapus]' || node.author === '[Dihapus]';
+  const isHighlighted = targetHighlightCommentId === node.id;
   const hasChildren = node.children && node.children.length > 0;
 
   const canDelete =
@@ -146,13 +151,15 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
       (node.author && node.author.toLowerCase() === currentUserName.toLowerCase()));
 
   return (
-    <div className={`relative ${depth > 0 ? 'mt-1.5' : 'mt-2.5'}`}>
+    <div id={`comment-${node.id}`} className={`relative ${depth > 0 ? 'mt-1.5' : 'mt-2.5'}`}>
       {/* Main Comment Card */}
       <div
         className={`rounded-xl border transition-all space-y-1 h-auto ${
           depth > 0 ? 'p-2 sm:p-2.5' : 'p-2.5 sm:p-3'
         } ${
-          node.isPinned
+          isHighlighted
+            ? 'bg-sky-100/90 dark:bg-slate-800 border-cyan-400 dark:border-cyan-400 ring-2 ring-cyan-400 shadow-md'
+            : node.isPinned
             ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700/60 ring-1 ring-amber-300/50'
             : isDeleted
             ? 'bg-slate-100/80 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800'
@@ -289,7 +296,15 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
           <textarea
             value={inlineReplyText}
             onChange={(e) => onChangeInlineText(e.target.value)}
-            placeholder={`Tulis balasan Anda untuk @${node.author}...`}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (inlineReplyText.trim().length > 0) {
+                  onSubmitInlineReply(node.id);
+                }
+              }
+            }}
+            placeholder={`Tulis balasan Anda untuk @${node.author}... (Enter untuk kirim, Shift+Enter untuk baris baru)`}
             rows={2}
             className="w-full p-2 text-xs text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-1 focus:ring-[#006194] dark:focus:ring-cyan-400 resize-none"
             autoFocus
@@ -328,6 +343,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               activeReplyId={activeReplyId}
               inlineReplyText={inlineReplyText}
               collapsedSet={collapsedSet}
+              targetHighlightCommentId={targetHighlightCommentId}
               onToggleReply={onToggleReply}
               onCancelReply={onCancelReply}
               onChangeInlineText={onChangeInlineText}
@@ -368,7 +384,9 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
   globalSearch,
   currentUserRole = 'Karyawan',
   currentUserName = 'Ananda Reva',
-  currentUserId = 'u-karyawan'
+  currentUserId = 'u-karyawan',
+  targetTopicId,
+  targetHighlightCommentId
 }) => {
   const [selectedTopicId, setSelectedTopicId] = useState<string>(topics[0]?.id || '');
   const [selectedDivisionFilter, setSelectedDivisionFilter] = useState<string>('Semua Divisi');
@@ -378,6 +396,34 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
   const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
   const [inlineReplyText, setInlineReplyText] = useState('');
   const [collapsedComments, setCollapsedComments] = useState<Set<string>>(new Set());
+  const [highlightCommentId, setHighlightCommentId] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (targetTopicId) {
+      setSelectedTopicId(targetTopicId);
+    }
+  }, [targetTopicId]);
+
+  React.useEffect(() => {
+    if (targetHighlightCommentId) {
+      setHighlightCommentId(targetHighlightCommentId);
+      const scrollTimer = setTimeout(() => {
+        const element = document.getElementById(`comment-${targetHighlightCommentId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 350);
+
+      const clearTimer = setTimeout(() => {
+        setHighlightCommentId(null);
+      }, 3500);
+
+      return () => {
+        clearTimeout(scrollTimer);
+        clearTimeout(clearTimer);
+      };
+    }
+  }, [targetHighlightCommentId, selectedTopicId]);
 
   const divisionsList =
     categories && categories.length > 0
@@ -820,6 +866,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                         activeReplyId={activeReplyId}
                         inlineReplyText={inlineReplyText}
                         collapsedSet={collapsedComments}
+                        targetHighlightCommentId={highlightCommentId}
                         onToggleReply={handleToggleReply}
                         onCancelReply={() => {
                           setActiveReplyId(null);
@@ -843,7 +890,15 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                   <textarea
                     value={mainCommentText}
                     onChange={(e) => setMainCommentText(e.target.value)}
-                    placeholder="Ketik tanggapan Anda untuk topik ini..."
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (mainCommentText.trim().length > 0) {
+                          handleSendMainComment(e);
+                        }
+                      }
+                    }}
+                    placeholder="Ketik tanggapan Anda untuk topik ini... (Enter untuk kirim, Shift+Enter untuk baris baru)"
                     rows={2}
                     className="w-full p-2 text-xs text-slate-900 dark:text-slate-100 font-medium placeholder-slate-500 dark:placeholder-slate-400 bg-white dark:bg-slate-900 outline-none resize-none"
                     required
