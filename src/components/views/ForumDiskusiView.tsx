@@ -151,128 +151,6 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
     triggerToast(`Topik baru "${newTopic.title}" berhasil dibuat.`);
   };
 
-  // Render a comment and its nested child replies (Reddit-style Branching Tree)
-  const renderCommentItem = (comment: ForumComment, depth = 0): React.ReactNode => {
-    // Find direct child replies by parentId OR by @author prefix matching
-    const childReplies = activeTopic
-      ? activeTopic.comments.filter(
-          (c) => c.parentId === comment.id || (!c.parentId && c.content.startsWith(`@${comment.author}`))
-        )
-      : [];
-
-    const canDelete =
-      currentUserRole === 'Admin' ||
-      (comment.author && comment.author.toLowerCase() === currentUserName.toLowerCase());
-
-    const canPin =
-      currentUserRole === 'Admin' ||
-      currentUserRole === 'Manajer' ||
-      (activeTopic && activeTopic.author.toLowerCase() === currentUserName.toLowerCase());
-
-    return (
-      <div key={comment.id} className="space-y-2">
-        {/* Comment Card */}
-        <div
-          className={`p-4 rounded-xl border transition-all space-y-2 ${
-            comment.isPinned
-              ? 'bg-amber-50 border-amber-300 ring-1 ring-amber-300/50'
-              : 'bg-slate-50 border-slate-200'
-          }`}
-        >
-          {/* Pinned Badge */}
-          {comment.isPinned && (
-            <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-amber-800 mb-1">
-              <span className="material-symbols-outlined text-sm text-amber-600">push_pin</span>
-              <span>Disematkan</span>
-            </div>
-          )}
-
-          {/* Comment Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              {comment.avatar ? (
-                <img
-                  src={comment.avatar}
-                  alt={comment.author}
-                  className="w-8 h-8 rounded-full object-cover border border-slate-200"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-sky-100 text-[#006194] font-bold text-xs flex items-center justify-center border border-sky-200">
-                  {comment.initials || 'U'}
-                </div>
-              )}
-              <div>
-                <p className="font-bold text-slate-900 text-xs">{comment.author}</p>
-                <p className="text-[10px] text-slate-500 font-medium">{comment.authorRole}</p>
-              </div>
-            </div>
-            <span className="text-[10px] text-slate-400 font-medium">{comment.timestamp}</span>
-          </div>
-
-          {/* Comment Content */}
-          <p className="text-xs text-slate-800 leading-relaxed pl-10 whitespace-pre-line">
-            {comment.content}
-          </p>
-
-          {/* Action Controls */}
-          <div className="flex items-center justify-end gap-2 pt-1 text-[11px] font-semibold">
-            {/* Reply Button */}
-            <button
-              type="button"
-              onClick={() => {
-                setReplyParentComment(comment);
-                setNewCommentText(`@${comment.author} `);
-                const el = document.querySelector<HTMLTextAreaElement>('textarea');
-                if (el) el.focus();
-              }}
-              className="px-2.5 py-1 text-slate-600 hover:text-[#006194] hover:bg-slate-200/70 rounded-lg transition-all flex items-center gap-1"
-            >
-              <span className="material-symbols-outlined text-[15px]">reply</span>
-              <span>Balas</span>
-            </button>
-
-            {/* Pin / Unpin Button */}
-            {canPin && onTogglePinComment && activeTopic && (
-              <button
-                type="button"
-                onClick={() => onTogglePinComment(activeTopic.id, comment.id)}
-                className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
-                  comment.isPinned
-                    ? 'text-amber-800 bg-amber-100 hover:bg-amber-200'
-                    : 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
-                }`}
-                title={comment.isPinned ? 'Lepas Sematan' : 'Sematkan Pesan'}
-              >
-                <span className="material-symbols-outlined text-[15px]">push_pin</span>
-                <span>{comment.isPinned ? 'Lepas Sematan' : 'Sematkan'}</span>
-              </button>
-            )}
-
-            {/* Delete Button */}
-            {canDelete && onDeleteComment && activeTopic && (
-              <button
-                type="button"
-                onClick={() => onDeleteComment(activeTopic.id, comment.id)}
-                className="px-2.5 py-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-all flex items-center gap-1"
-                title="Hapus balasan"
-              >
-                <span className="material-symbols-outlined text-[15px]">delete</span>
-                <span>Hapus</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Reddit-style Nested Child Branch Container */}
-        {childReplies.length > 0 && (
-          <div className="border-l-2 border-[#006194]/40 pl-3 sm:pl-5 space-y-3 mt-2 ml-4 sm:ml-6">
-            {childReplies.map((reply) => renderCommentItem(reply, depth + 1))}
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -301,7 +179,6 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
         <div className="col-span-12 lg:col-span-5 xl:col-span-4 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
           {/* Division Filter Controls */}
           <div className="space-y-2">
-
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">
@@ -420,11 +297,11 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
                     <img
                       src={activeTopic.authorAvatar}
                       alt={activeTopic.author}
-                      className="w-10 h-10 rounded-full border border-slate-200 object-cover"
+                      className="w-10 h-10 rounded-full object-cover border border-slate-200"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-[#006194] text-white flex items-center justify-center font-bold text-xs">
-                      {activeTopic.author.substring(0, 2).toUpperCase()}
+                    <div className="w-10 h-10 rounded-full bg-[#006194] text-white font-bold text-sm flex items-center justify-center shadow-xs">
+                      {activeTopic.authorInitials || 'U'}
                     </div>
                   )}
                   <div>
@@ -434,89 +311,149 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
                 </div>
               </div>
 
-              {/* Thread Content */}
-              <div className="text-sm text-slate-700 leading-relaxed space-y-3 whitespace-pre-line">
+              {/* Post Content */}
+              <div className="prose prose-slate max-w-none text-sm text-slate-700 leading-relaxed whitespace-pre-line">
                 {activeTopic.content}
               </div>
+
+              {/* Tags */}
+              {activeTopic.tags && activeTopic.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {activeTopic.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2.5 py-1 bg-slate-100 text-slate-600 text-[11px] font-semibold rounded-md border border-slate-200/60"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               {/* Comments Section */}
               <div className="pt-6 border-t border-slate-200 space-y-4">
                 <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
                   <span className="material-symbols-outlined text-[#006194]">question_answer</span>
-                  <span>Diskusi Balasan ({activeTopic.comments.length})</span>
+                  <span>Diskusi Balasan ({activeTopic.comments ? activeTopic.comments.length : 0})</span>
                 </h4>
 
                 <div className="space-y-3">
-                  {(() => {
-                    const allChildIds = new Set<string>();
-                    activeTopic.comments.forEach((c) => {
-                      if (c.parentId) {
-                        allChildIds.add(c.id);
-                      } else {
-                        const matchedParent = activeTopic.comments.find(
-                          (parent) => parent.id !== c.id && c.content.startsWith(`@${parent.author}`)
-                        );
-                        if (matchedParent) {
-                          allChildIds.add(c.id);
-                        }
-                      }
-                    });
+                  {!activeTopic.comments || activeTopic.comments.length === 0 ? (
+                    <p className="text-xs text-slate-400 py-4 italic">
+                      Belum ada balasan. Jadilah yang pertama memberikan masukan!
+                    </p>
+                  ) : (
+                    activeTopic.comments.map((c) => {
+                      const canDelete =
+                        currentUserRole === 'Admin' ||
+                        (c.author && c.author.toLowerCase() === currentUserName.toLowerCase());
 
-                    const topLevelComments = activeTopic.comments.filter((c) => !allChildIds.has(c.id));
-                    const sortedTopLevel = [...topLevelComments].sort((a, b) => {
-                      if (a.isPinned && !b.isPinned) return -1;
-                      if (!a.isPinned && b.isPinned) return 1;
-                      return 0;
-                    });
+                      const canPin =
+                        currentUserRole === 'Admin' ||
+                        currentUserRole === 'Manajer' ||
+                        (activeTopic && activeTopic.author.toLowerCase() === currentUserName.toLowerCase());
 
-                    if (sortedTopLevel.length === 0) {
                       return (
-                        <p className="text-xs text-slate-400 py-4 italic">
-                          Belum ada balasan. Jadilah yang pertama memberikan masukan!
-                        </p>
-                      );
-                    }
+                        <div
+                          key={c.id}
+                          className={`p-4 rounded-xl border transition-all space-y-2 ${
+                            c.isPinned
+                              ? 'bg-amber-50 border-amber-300 ring-1 ring-amber-300/50'
+                              : 'bg-slate-50 border-slate-200'
+                          }`}
+                        >
+                          {/* Pinned Badge */}
+                          {c.isPinned && (
+                            <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-amber-800 mb-1">
+                              <span className="material-symbols-outlined text-sm text-amber-600">push_pin</span>
+                              <span>Disematkan</span>
+                            </div>
+                          )}
 
-                    return sortedTopLevel.map((comment) => renderCommentItem(comment));
-                  })()}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2.5">
+                              {c.avatar ? (
+                                <img
+                                  src={c.avatar}
+                                  alt={c.author}
+                                  className="w-8 h-8 rounded-full object-cover border border-slate-200"
+                                />
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-sky-100 text-[#006194] font-bold text-xs flex items-center justify-center border border-sky-200">
+                                  {c.initials || 'U'}
+                                </div>
+                              )}
+                              <div>
+                                <p className="font-bold text-slate-900 text-xs">{c.author}</p>
+                                <p className="text-[10px] text-slate-500 font-medium">{c.authorRole}</p>
+                              </div>
+                            </div>
+                            <span className="text-[10px] text-slate-400 font-medium">{c.timestamp}</span>
+                          </div>
+
+                          <p className="text-xs text-slate-800 leading-relaxed pl-10 whitespace-pre-line">
+                            {c.content}
+                          </p>
+
+                          <div className="flex items-center justify-end gap-2 pt-1 text-[11px] font-semibold">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setNewCommentText(`@${c.author} `);
+                                const el = document.querySelector<HTMLTextAreaElement>('textarea');
+                                if (el) el.focus();
+                              }}
+                              className="px-2.5 py-1 text-slate-600 hover:text-[#006194] hover:bg-slate-200/70 rounded-lg transition-all flex items-center gap-1"
+                            >
+                              <span className="material-symbols-outlined text-[15px]">reply</span>
+                              <span>Balas</span>
+                            </button>
+
+                            {canPin && onTogglePinComment && activeTopic && (
+                              <button
+                                type="button"
+                                onClick={() => onTogglePinComment(activeTopic.id, c.id)}
+                                className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                                  c.isPinned
+                                    ? 'text-amber-800 bg-amber-100 hover:bg-amber-200'
+                                    : 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
+                                }`}
+                                title={c.isPinned ? 'Lepas Sematan' : 'Sematkan Pesan'}
+                              >
+                                <span className="material-symbols-outlined text-[15px]">push_pin</span>
+                                <span>{c.isPinned ? 'Lepas Sematan' : 'Sematkan'}</span>
+                              </button>
+                            )}
+
+                            {canDelete && onDeleteComment && activeTopic && (
+                              <button
+                                type="button"
+                                onClick={() => onDeleteComment(activeTopic.id, c.id)}
+                                className="px-2.5 py-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-all flex items-center gap-1"
+                                title="Hapus balasan"
+                              >
+                                <span className="material-symbols-outlined text-[15px]">delete</span>
+                                <span>Hapus</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </div>
 
               {/* Reply Comment Editor */}
               <form onSubmit={handleSendComment} className="pt-4 border-t border-slate-200 space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-200 block">
-                    {replyParentComment ? (
-                      <span className="flex items-center gap-2 text-[#006194] dark:text-sky-400">
-                        <span className="material-symbols-outlined text-base">reply</span>
-                        Membalas tanggapan <strong>@{replyParentComment.author}</strong>
-                      </span>
-                    ) : (
-                      'Tulis Balasan Diskusi'
-                    )}
-                  </label>
-                  {replyParentComment && (
-                    <button
-                      type="button"
-                      onClick={() => setReplyParentComment(null)}
-                      className="text-[11px] text-rose-500 hover:text-rose-700 font-bold flex items-center gap-1"
-                    >
-                      <span className="material-symbols-outlined text-xs">close</span>
-                      <span>Batal Balas Spesifik</span>
-                    </button>
-                  )}
-                </div>
+                <label className="text-xs font-bold text-slate-700 block">Tulis Balasan Diskusi</label>
                 <div className="border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#006194]/20 focus-within:border-[#006194]">
                   <textarea
                     value={newCommentText}
                     onChange={(e) => setNewCommentText(e.target.value)}
-                    placeholder={
-                      replyParentComment
-                        ? `Ketik balasan Anda untuk @${replyParentComment.author}...`
-                        : 'Ketik tanggapan Anda di sini...'
-                    }
+                    placeholder="Ketik tanggapan Anda di sini..."
                     rows={3}
-                    className="w-full p-3 text-xs text-slate-800 dark:text-white outline-none resize-none bg-transparent"
+                    className="w-full p-3 text-xs text-slate-800 outline-none resize-none"
                     required
                   />
                 </div>
@@ -527,7 +464,7 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
                     className="px-5 py-2.5 bg-[#006194] text-white rounded-xl text-xs font-bold hover:bg-[#004b73] transition-all flex items-center gap-2"
                   >
                     <span className="material-symbols-outlined text-base">send</span>
-                    <span>{replyParentComment ? 'Kirim Balasan Branch' : 'Kirim Balasan'}</span>
+                    <span>Kirim Balasan</span>
                   </button>
                 </div>
               </form>
