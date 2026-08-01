@@ -567,7 +567,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
       setInlineReplyText('');
     } else {
       setActiveReplyId(commentId);
-      setInlineReplyText(`@${authorName} `);
+      setInlineReplyText('');
     }
   };
 
