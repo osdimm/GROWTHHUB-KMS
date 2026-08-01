@@ -690,28 +690,34 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                     onClick={() => setSelectedTopicId(topic.id)}
                     className={`p-4 rounded-xl border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-sky-50/80 dark:bg-slate-800 border-[#006194] dark:border-sky-500 shadow-sm'
-                        : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+                        ? 'bg-sky-50 dark:bg-slate-800 border-[#006194] dark:border-cyan-400 shadow-sm'
+                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold text-[#006194] dark:text-sky-300 bg-sky-100 dark:bg-sky-950/80 px-2 py-0.5 rounded">
+                      <span
+                        className={`text-[10px] font-extrabold px-2 py-0.5 rounded ${
+                          isSelected
+                            ? 'bg-[#006194] text-white dark:bg-cyan-950 dark:text-cyan-300 dark:border dark:border-cyan-800'
+                            : 'bg-sky-100 text-[#006194] dark:bg-slate-800 dark:text-cyan-400 dark:border dark:border-slate-700'
+                        }`}
+                      >
                         {topic.category}
                       </span>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                         {topic.date}
                       </span>
                     </div>
 
-                    <h4 className="font-bold text-slate-900 dark:text-white text-sm line-clamp-2 leading-snug">
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm line-clamp-2 leading-snug">
                       {topic.title}
                     </h4>
 
                     <div className="mt-3 flex items-center justify-between text-xs">
-                      <span className="font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[140px]">
+                      <span className="font-semibold text-slate-600 dark:text-slate-400 truncate max-w-[140px]">
                         {topic.author}
                       </span>
-                      <span className="flex items-center gap-1 font-bold text-[#006194] dark:text-sky-400">
+                      <span className="flex items-center gap-1 font-bold text-[#006194] dark:text-cyan-400">
                         <span className="material-symbols-outlined text-[16px]">chat_bubble</span>
                         <span>{topic.comments ? topic.comments.length : 0} Balasan</span>
                       </span>
@@ -994,18 +1000,18 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
         </div>
       )}
 
-      {/* Instant Reply Notification Popup Alert */}
+      {/* Instant Reply Notification Popup Alert (Theme-Aware) */}
       {replyNotificationPopup && (
-        <div className="fixed top-6 right-6 z-50 max-w-md w-full bg-white dark:bg-slate-900 border-2 border-[#006194] dark:border-sky-500 rounded-2xl shadow-2xl p-4 space-y-3 animate-in slide-in-from-top-5 duration-200">
+        <div className="fixed top-6 right-6 z-50 max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl dark:shadow-cyan-950/40 p-4 space-y-3 animate-in slide-in-from-top-5 duration-200">
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-            <div className="flex items-center gap-2 text-[#006194] dark:text-sky-400 font-extrabold text-xs">
+            <div className="flex items-center gap-2 text-[#006194] dark:text-cyan-400 font-extrabold text-xs">
               <span className="material-symbols-outlined text-lg">question_answer</span>
-              <span>Pemberitahuan Balasan Komentar</span>
+              <span className="text-slate-900 dark:text-white font-bold">Pemberitahuan Balasan Komentar</span>
             </div>
             <button
               type="button"
               onClick={() => setReplyNotificationPopup(null)}
-              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-lg transition-colors"
+              className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 p-0.5 rounded-lg transition-colors"
             >
               <span className="material-symbols-outlined text-sm">close</span>
             </button>
@@ -1013,9 +1019,9 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
 
           <div className="space-y-1.5">
             <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              <strong className="text-slate-900 dark:text-white">{replyNotificationPopup.senderName}</strong> membalas komentar <strong className="text-[#006194] dark:text-sky-400">{replyNotificationPopup.targetAuthor}</strong>:
+              <strong className="text-[#006194] dark:text-cyan-400 font-bold">{replyNotificationPopup.senderName}</strong> membalas komentar <strong className="text-[#006194] dark:text-cyan-400 font-bold">{replyNotificationPopup.targetAuthor}</strong>:
             </p>
-            <div className="p-3 bg-sky-50/90 border border-sky-200/80 rounded-xl text-xs font-bold text-slate-900 whitespace-pre-line leading-relaxed shadow-sm">
+            <div className="p-3 bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed shadow-sm">
               {replyNotificationPopup.message}
             </div>
           </div>
