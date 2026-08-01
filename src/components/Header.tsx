@@ -249,8 +249,8 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Single Dynamic Theme Dropdown Button */}
-        <div className="relative" ref={themeRef}>
+        {/* Single Dynamic Theme Dropdown Button (Hidden visually, backend logic intact) */}
+        <div className="hidden relative" ref={themeRef}>
           <button
             type="button"
             onClick={() => setShowThemeMenu(!showThemeMenu)}
