@@ -13,15 +13,47 @@ export const HakAksesView: React.FC<HakAksesViewProps> = ({
   globalSearch
 }) => {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [selectedDivisionFilter, setSelectedDivisionFilter] = useState<string>('Semua Divisi');
+  const [showDivDropdown, setShowDivDropdown] = useState(false);
+  const [divisionSearch, setDivisionSearch] = useState('');
+
+  const divisions = [
+    'Semua Divisi',
+    'Talent Acquisition',
+    'Talent Development',
+    'Organizational Development',
+    'Employee Benefit',
+    'Administration',
+    'Graphic Design',
+    'Copywriting',
+    'Content Coordinator',
+    'Video Editor',
+    'Public Relation',
+    'Social Media Officer',
+    'Key Opinion Leader Coordinator',
+    'Representative',
+    'Program Specialist',
+    'Project Representative',
+    'Community & Digital Marketing'
+  ];
+
+  const filteredDivisions = divisions.filter((d) =>
+    d.toLowerCase().includes(divisionSearch.toLowerCase())
+  );
 
   const query = globalSearch.toLowerCase();
 
-  const filteredUsers = users.filter((u) =>
-    u.name.toLowerCase().includes(query) ||
-    u.email.toLowerCase().includes(query) ||
-    u.role.toLowerCase().includes(query) ||
-    u.division.toLowerCase().includes(query)
-  );
+  const filteredUsers = users.filter((u) => {
+    const matchesDiv =
+      selectedDivisionFilter === 'Semua Divisi' ||
+      u.division.toLowerCase() === selectedDivisionFilter.toLowerCase();
+    const matchesQuery =
+      u.name.toLowerCase().includes(query) ||
+      u.email.toLowerCase().includes(query) ||
+      u.role.toLowerCase().includes(query) ||
+      u.division.toLowerCase().includes(query);
+    return matchesDiv && matchesQuery;
+  });
 
   const handleRoleChange = (userId: string, userName: string, newRole: UserRole) => {
     onUpdateUserRole(userId, newRole);
@@ -34,7 +66,59 @@ export const HakAksesView: React.FC<HakAksesViewProps> = ({
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Hak Akses</h2>
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Hak Akses & Peran Pengguna</h2>
+          <p className="text-sm text-slate-500 mt-0.5">
+            Atur dan tetapkan peran (Admin, Manajer, Karyawan, Associate) untuk setiap anggota tim.
+          </p>
+        </div>
+
+        {/* Division Filter Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setShowDivDropdown(!showDivDropdown)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-800 border border-slate-200 rounded-xl text-xs font-semibold hover:bg-slate-50 transition-all shadow-2xs"
+          >
+            <span className="material-symbols-outlined text-slate-500 text-[18px]">filter_list</span>
+            <span>Divisi: {selectedDivisionFilter}</span>
+            <span className="material-symbols-outlined text-slate-400 text-[16px]">expand_more</span>
+          </button>
+
+          {showDivDropdown && (
+            <div className="absolute right-0 mt-2 w-72 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 p-2 animate-in fade-in duration-150">
+              <div className="p-2 border-b border-slate-100">
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[16px]">
+                    search
+                  </span>
+                  <input
+                    type="text"
+                    value={divisionSearch}
+                    onChange={(e) => setDivisionSearch(e.target.value)}
+                    placeholder="Cari divisi..."
+                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border-none rounded-lg text-xs focus:ring-1 focus:ring-[#006194] outline-none"
+                  />
+                </div>
+              </div>
+              <div className="max-h-56 overflow-y-auto custom-scrollbar py-1">
+                {filteredDivisions.map((div) => (
+                  <button
+                    key={div}
+                    onClick={() => {
+                      setSelectedDivisionFilter(div);
+                      setShowDivDropdown(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                      selectedDivisionFilter === div
+                        ? 'bg-sky-50 text-[#006194] font-bold'
+                        : 'text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    {div}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
