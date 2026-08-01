@@ -449,7 +449,7 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
 
   const [showNewTopicModal, setShowNewTopicModal] = useState(false);
   const [newTopicTitle, setNewTopicTitle] = useState('');
-  const [newTopicCategory, setNewTopicCategory] = useState(divisionsList[0] || 'Talent Development');
+  const [newTopicCategory, setNewTopicCategory] = useState('');
   const [newTopicContent, setNewTopicContent] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [deleteConfirmTopic, setDeleteConfirmTopic] = useState<ForumTopic | null>(null);
@@ -621,7 +621,11 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
 
   const handleCreateTopicSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTopicTitle || !newTopicContent) return;
+    if (!newTopicTitle.trim() || !newTopicContent.trim()) return;
+    if (!newTopicCategory) {
+      alert('Harap pilih Kategori Divisi terlebih dahulu.');
+      return;
+    }
 
     const newTopic: ForumTopic = {
       id: `ft-${Date.now()}`,
@@ -955,15 +959,21 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
 
               <div>
                 <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase block mb-1">
-                  Kategori Divisi
+                  Kategori Divisi <span className="text-rose-500">*</span>
                 </label>
                 <select
+                  required
                   value={newTopicCategory}
                   onChange={(e) => setNewTopicCategory(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 outline-none focus:ring-1 focus:ring-[#006194]"
+                  className={`w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold outline-none focus:ring-1 focus:ring-[#006194] transition-colors ${
+                    !newTopicCategory ? 'text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200'
+                  }`}
                 >
+                  <option value="" disabled hidden>
+                    Pilih Kategori Divisi
+                  </option>
                   {divisionsList.map((d) => (
-                    <option key={d} value={d}>
+                    <option key={d} value={d} className="text-slate-800 dark:text-slate-200">
                       {d}
                     </option>
                   ))}

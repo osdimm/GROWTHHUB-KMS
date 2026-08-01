@@ -57,8 +57,8 @@ export const HandoverRotasiView: React.FC<HandoverRotasiViewProps> = ({
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
-  const [period, setPeriod] = useState<string>('Q1 2026');
-  const [division, setDivision] = useState('Talent Development');
+  const [period, setPeriod] = useState<string>('');
+  const [division, setDivision] = useState('');
   const [fileType, setFileType] = useState<'DOCX' | 'PDF' | 'XLSX' | 'PPTX' | 'LINK'>('DOCX');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -241,6 +241,16 @@ export const HandoverRotasiView: React.FC<HandoverRotasiViewProps> = ({
 
     if (!title.trim()) {
       setFileError('Judul dokumen handover wajib diisi.');
+      return;
+    }
+
+    if (!period) {
+      setFileError('Harap pilih Periode Rotasi terlebih dahulu.');
+      return;
+    }
+
+    if (!division) {
+      setFileError('Harap pilih Divisi terlebih dahulu.');
       return;
     }
 
@@ -560,20 +570,27 @@ export const HandoverRotasiView: React.FC<HandoverRotasiViewProps> = ({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
                 <div>
-                  <div className="mb-1">
-                    <label className="text-xs font-bold text-slate-600 uppercase">
-                      Periode Rotasi
-                    </label>
-                  </div>
+                  <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase block mb-1.5">
+                    Periode Rotasi <span className="text-rose-500">*</span>
+                  </label>
                   <select
+                    required
                     value={period}
-                    onChange={(e) => setPeriod(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-1 focus:ring-[#006194] outline-none"
+                    onChange={(e) => {
+                      setPeriod(e.target.value);
+                      setFileError(null);
+                    }}
+                    className={`w-full h-[40px] px-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#006194]/20 focus:border-[#006194] outline-none transition-colors ${
+                      !period ? 'text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'
+                    }`}
                   >
+                    <option value="" disabled hidden>
+                      Pilih Periode Rotasi
+                    </option>
                     {periodsList.map((p) => (
-                      <option key={p} value={p}>
+                      <option key={p} value={p} className="text-slate-800 dark:text-slate-100">
                         {p}
                       </option>
                     ))}
@@ -581,16 +598,25 @@ export const HandoverRotasiView: React.FC<HandoverRotasiViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-600 uppercase block mb-1">
-                    Divisi
+                  <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase block mb-1.5">
+                    Divisi <span className="text-rose-500">*</span>
                   </label>
                   <select
+                    required
                     value={division}
-                    onChange={(e) => setDivision(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs"
+                    onChange={(e) => {
+                      setDivision(e.target.value);
+                      setFileError(null);
+                    }}
+                    className={`w-full h-[40px] px-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#006194]/20 focus:border-[#006194] outline-none transition-colors ${
+                      !division ? 'text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'
+                    }`}
                   >
+                    <option value="" disabled hidden>
+                      Pilih Divisi
+                    </option>
                     {divisions.filter((d) => d !== 'Semua').map((d) => (
-                      <option key={d} value={d}>
+                      <option key={d} value={d} className="text-slate-800 dark:text-slate-100">
                         {d}
                       </option>
                     ))}
