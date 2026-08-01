@@ -1,0 +1,6 @@
+{
+  "name": "Growth Hub KMS",
+  "description": "Enterprise Knowledge Management System with user management, access control, knowledge base, rotation handover, discussion forum, usage reports, and profile settings.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
