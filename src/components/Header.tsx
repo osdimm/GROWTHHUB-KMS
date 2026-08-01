@@ -185,12 +185,12 @@ export const Header: React.FC<HeaderProps> = ({
                         <div className="space-y-1.5">
                           <div className="flex items-center justify-between text-[11px]">
                             <span className="font-extrabold text-[#006194] dark:text-cyan-400 truncate max-w-[170px]">
-                              📢 {n.sender}
+                              {n.title || `📢 ${n.author || 'Sistem'}`}
                             </span>
-                            <span className="text-slate-400 dark:text-slate-500 text-[10px] shrink-0">{n.timestamp}</span>
+                            <span className="text-slate-400 dark:text-slate-500 text-[10px] shrink-0">{n.time}</span>
                           </div>
                           <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-medium line-clamp-3">
-                            {n.message}
+                            {n.desc}
                           </p>
                         </div>
                         <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[10px]">

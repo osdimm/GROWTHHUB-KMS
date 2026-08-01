@@ -198,10 +198,21 @@ export default function App() {
   const [activities, setActivities] = useState<ActivityLog[]>([]);
   const [popularTopics] = useState<PopularTopic[]>(popularTopicsList);
   const [pendingDocs, setPendingDocs] = useState<PendingDoc[]>([]);
-  const [notifications, setNotifications] = useState<AppNotification[]>(initialNotifications);
+  const [notifications, setNotifications] = useState<AppNotification[]>(() => {
+    try {
+      const saved = localStorage.getItem('kms_notifications');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.error('Error loading kms_notifications from localStorage', e);
+    }
+    return initialNotifications;
+  });
   const [isLoadingSupabase, setIsLoadingSupabase] = useState<boolean>(true);
 
-  // Sync articles & handoverDocs to localStorage
+  // Sync articles, handoverDocs & notifications to localStorage
   useEffect(() => {
     if (articles && articles.length > 0) {
       localStorage.setItem('kms_articles', JSON.stringify(articles));
@@ -213,6 +224,12 @@ export default function App() {
       localStorage.setItem('kms_handover_docs', JSON.stringify(handoverDocs));
     }
   }, [handoverDocs]);
+
+  useEffect(() => {
+    if (notifications && notifications.length > 0) {
+      localStorage.setItem('kms_notifications', JSON.stringify(notifications));
+    }
+  }, [notifications]);
 
   // Fetch Live Data from Supabase on Mount & Smart Merge with localStorage
   useEffect(() => {
@@ -352,6 +369,26 @@ export default function App() {
         targetAuthor,
         senderName: commentAuthor,
         message: newComment.content || ''
+      });
+
+      // Also append an AppNotification to persistent Notifications list for Header bell!
+      const replyNotifItem: AppNotification = {
+        id: `notif-reply-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        title: `💬 Balasan Komentar dari ${commentAuthor}`,
+        desc: `"${newComment.content || ''}"`,
+        time: 'Baru saja',
+        createdAt: Date.now(),
+        author: commentAuthor,
+        targetUserName: targetAuthor,
+        type: 'info',
+        read: false
+      };
+
+      setNotifications((prev) => {
+        if (prev.some((n) => n.id === replyNotifItem.id || (n.desc === replyNotifItem.desc && n.author === commentAuthor))) {
+          return prev;
+        }
+        return [replyNotifItem, ...prev];
       });
 
       // Auto-dismiss after 6 seconds
@@ -588,10 +625,11 @@ export default function App() {
   // Filter notifications relevant to current active user (with 7-day auto-expiry filter)
   const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
   const userNotifications = notifications.filter((n) => {
-    // 7-day auto-expiry check
-    const createdTime = n.createdAt || parseInt(n.id.replace(/\D/g, ''), 10) || Date.now();
-    if (Date.now() - createdTime > SEVEN_DAYS_MS) {
-      return false;
+    // 7-day auto-expiry check: ONLY filter if createdAt is a valid epoch timestamp in ms (> 1000000000000)
+    if (n.createdAt && typeof n.createdAt === 'number' && n.createdAt > 1000000000000) {
+      if (Date.now() - n.createdAt > SEVEN_DAYS_MS) {
+        return false;
+      }
     }
 
     // 1. Direct user notification (e.g. Rejection for uploader only, or uploader confirmation)
@@ -617,10 +655,11 @@ export default function App() {
 
     // 3. Role-based notification fallback
     if (n.targetRoles && n.targetRoles.length > 0) {
-      return n.targetRoles.includes(currentUser.role);
+      return n.targetRoles.includes(currentUser.role) || currentUser.role === 'Admin';
     }
 
-    return false;
+    // 4. Global notifications (system welcome or general announcements for all users)
+    return true;
   });
 
   const handleClearNotifications = () => {

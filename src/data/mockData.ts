@@ -582,6 +582,7 @@ export const initialNotifications: AppNotification[] = [
     title: 'Pengajuan Verifikasi Konten Baru',
     desc: 'Ananda Reva mengajukan "SOP Penyuntingan Video Shorts & Reels 2026" untuk diverifikasi Manajer.',
     time: '10m yang lalu',
+    createdAt: Date.now() - 10 * 60 * 1000,
     type: 'pending',
     targetRoles: ['Manajer'],
     read: false
@@ -591,6 +592,7 @@ export const initialNotifications: AppNotification[] = [
     title: '✅ Konten Disetujui & Dipublikasikan',
     desc: 'Dokumen "Modul Pelatihan Kepemimpinan & Perencanaan Karir" yang Anda unggah telah DISETUJUI oleh Manajer (Andi Darmawan).',
     time: '25m yang lalu',
+    createdAt: Date.now() - 25 * 60 * 1000,
     type: 'approved',
     targetUserName: 'Dandi Pangestu',
     targetUserId: 'u-admin',
@@ -601,6 +603,7 @@ export const initialNotifications: AppNotification[] = [
     title: 'Pengajuan Dalam Verifikasi',
     desc: 'Dokumen "SOP Penyuntingan Video Shorts & Reels 2026" yang Anda unggah sedang menunggu tinjauan Manajer.',
     time: '45m yang lalu',
+    createdAt: Date.now() - 45 * 60 * 1000,
     type: 'info',
     targetUserName: 'Ananda Reva',
     targetUserId: 'u-karyawan',
@@ -611,6 +614,7 @@ export const initialNotifications: AppNotification[] = [
     title: 'Sistem Knowledge Base',
     desc: 'Selamat datang di KMS Growth Hub. Selalu pastikan dokumen dan materi rotasi selalu diperbarui.',
     time: '1j yang lalu',
+    createdAt: Date.now() - 60 * 60 * 1000,
     type: 'info',
     read: false
   }
