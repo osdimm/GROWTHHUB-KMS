@@ -667,6 +667,10 @@ export default function App() {
     setNotifications((prev) => prev.map((n) => userNotifIds.has(n.id) ? { ...n, read: true } : n));
   };
 
+  const handleDeleteNotification = (notifId: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== notifId));
+  };
+
   const handleUpdateCurrentUser = (updated: Partial<User>) => {
     const newUser = { ...currentUser, ...updated };
     setUsers((prev) =>
@@ -1021,6 +1025,7 @@ export default function App() {
         onSwitchUserRole={handleSwitchUserRole}
         notifications={userNotifications}
         onClearNotifications={handleClearNotifications}
+        onDeleteNotification={handleDeleteNotification}
         activeTab={activeTab}
         themeMode={themeMode}
         setThemeMode={setThemeMode}

@@ -14,6 +14,7 @@ interface HeaderProps {
   onSwitchUserRole?: (role: UserRole) => void;
   notifications?: AppNotification[];
   onClearNotifications?: () => void;
+  onDeleteNotification?: (id: string) => void;
   activeTab?: NavigationTab;
   themeMode?: ThemeMode;
   setThemeMode?: (mode: ThemeMode) => void;
@@ -30,6 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSwitchUserRole,
   notifications = [],
   onClearNotifications,
+  onDeleteNotification,
   activeTab,
   themeMode = 'system',
   setThemeMode
@@ -158,7 +160,13 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               ) : (
                 <div className="max-h-[440px] overflow-y-auto p-3 space-y-2.5 custom-scrollbar">
-                  {notifications.map((n, idx) => (
+                  {notifications.map((n, idx) => {
+                    const isReplyNotif =
+                      n.id.startsWith('notif-reply-') ||
+                      n.title?.toLowerCase().includes('balasan') ||
+                      n.title?.toLowerCase().includes('komentar') ||
+                      n.desc?.toLowerCase().includes('membalas komentar');
+                    return (
                     <div
                       key={n.id}
                       className={`p-3.5 rounded-2xl border transition-all shadow-xs space-y-2 ${
@@ -197,15 +205,31 @@ export const Header: React.FC<HeaderProps> = ({
                         <span className="text-slate-400 dark:text-slate-500 font-semibold">
                           {n.author ? `Oleh: ${n.author}` : `Notifikasi #${idx + 1}`}
                         </span>
-                        {!n.read && (
-                          <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                            Belum dibaca
-                          </span>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {isReplyNotif && onDeleteNotification && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDeleteNotification(n.id);
+                              }}
+                              className="text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 font-bold flex items-center gap-0.5 hover:underline bg-rose-100/70 dark:bg-rose-950/80 px-2 py-0.5 rounded-md border border-rose-300/80 dark:border-rose-800 transition-colors"
+                              title="Hapus Notifikasi Balasan Ini"
+                            >
+                              <span className="material-symbols-outlined text-[10px]">delete</span>
+                              <span>Hapus</span>
+                            </button>
+                          )}
+                          {!n.read && (
+                            <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                              Belum dibaca
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  ))}
+                  )})}
                 </div>
               )}
             </div>
