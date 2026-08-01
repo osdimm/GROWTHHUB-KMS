@@ -50,8 +50,8 @@ import {
   saveActivityToSupabase
 } from './services/supabaseService';
 
-import { Sidebar, ThemeMode } from './components/Sidebar';
-import { Header } from './components/Header';
+import { Sidebar } from './components/Sidebar';
+import { Header, ThemeMode } from './components/Header';
 import { LogoutModal } from './components/LogoutModal';
 
 // Views
@@ -840,8 +840,6 @@ export default function App() {
         isOpenMobile={isMobileSidebarOpen}
         setIsOpenMobile={setIsMobileSidebarOpen}
         currentUser={currentUser}
-        themeMode={themeMode}
-        setThemeMode={setThemeMode}
       />
 
       {/* Top Header */}

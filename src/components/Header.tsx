@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavigationTab, User, UserRole, AppNotification } from '../types';
-import { ThemeMode } from './Sidebar';
+
+export type ThemeMode = 'light' | 'dark' | 'system';
 
 interface HeaderProps {
   title?: string;
