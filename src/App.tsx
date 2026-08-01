@@ -290,9 +290,64 @@ export default function App() {
     loadSupabaseData();
   }, []);
 
-  // Supabase Real-time Subscription for Forum Topics & Comments (Live Updates Like WhatsApp!)
+  // State for Realtime Reply Notification Popup Alert
+  const [replyNotificationPopup, setReplyNotificationPopup] = useState<{
+    targetAuthor: string;
+    senderName: string;
+    message: string;
+  } | null>(null);
+
+  const checkAndShowReplyPopup = (newComment: any, topicsList: ForumTopic[]) => {
+    if (!newComment) return;
+
+    const parentId = newComment.parent_id || newComment.parentId;
+    const commentAuthor = newComment.author;
+
+    // 3a. Only process if parentId exists (it's a reply to a comment)
+    if (!parentId) return;
+
+    // 3b. Find parent comment in topicsList or current state
+    let parentComment: ForumComment | undefined;
+    for (const topic of topicsList) {
+      if (topic.comments) {
+        const found = topic.comments.find((c: any) => c.id === parentId);
+        if (found) {
+          parentComment = found;
+          break;
+        }
+      }
+    }
+
+    if (!parentComment) return;
+
+    const targetAuthor = parentComment.author;
+    const loggedInUser = users.find((u) => u.id === currentUserId);
+    const loggedInUserName = loggedInUser ? loggedInUser.name : '';
+
+    // 3c & 3d. Trigger ONLY if logged-in user IS the target author AND NOT the sender
+    if (
+      targetAuthor &&
+      loggedInUserName &&
+      targetAuthor.toLowerCase() === loggedInUserName.toLowerCase() &&
+      commentAuthor &&
+      commentAuthor.toLowerCase() !== loggedInUserName.toLowerCase()
+    ) {
+      setReplyNotificationPopup({
+        targetAuthor,
+        senderName: commentAuthor,
+        message: newComment.content || ''
+      });
+
+      // 5. Auto-dismiss after 6 seconds
+      setTimeout(() => {
+        setReplyNotificationPopup(null);
+      }, 6000);
+    }
+  };
+
+  // Supabase Real-time Subscription for Forum Topics & Comments (Live Updates Lintas Session!)
   useEffect(() => {
-    const handleRealtimeUpdate = async () => {
+    const handleRealtimeUpdate = async (insertedComment?: any) => {
       try {
         const latestTopics = await getForumTopicsFromSupabase();
         if (latestTopics && latestTopics.length > 0) {
@@ -312,6 +367,11 @@ export default function App() {
               };
             });
           });
+
+          // Check and trigger popup for the recipient user
+          if (insertedComment) {
+            checkAndShowReplyPopup(insertedComment, latestTopics);
+          }
         }
       } catch (e) {
         console.warn('Realtime fetch warning:', e);
@@ -329,7 +389,22 @@ export default function App() {
       )
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'forum_comments' },
+        { event: 'INSERT', schema: 'public', table: 'forum_comments' },
+        (payload) => {
+          const newComment = payload.new;
+          handleRealtimeUpdate(newComment);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'forum_comments' },
+        () => {
+          handleRealtimeUpdate();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'forum_comments' },
         () => {
           handleRealtimeUpdate();
         }
@@ -339,7 +414,7 @@ export default function App() {
     return () => {
       supabase.removeChannel(forumChannel);
     };
-  }, []);
+  }, [currentUserId, users]);
 
 
   // Verification & Notification Handlers
@@ -1076,6 +1151,34 @@ export default function App() {
                 <span className="material-symbols-outlined text-base">person</span>
                 <span>Arahkan ke Profil Pengguna</span>
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Realtime Instant Reply Notification Popup Alert (Cross-Session / Multi-Device) */}
+      {replyNotificationPopup && (
+        <div className="fixed top-6 right-6 z-50 max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl dark:shadow-cyan-950/40 p-4 space-y-3 animate-in slide-in-from-top-5 duration-200">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+            <div className="flex items-center gap-2 text-[#006194] dark:text-cyan-400 font-extrabold text-xs">
+              <span className="material-symbols-outlined text-lg">question_answer</span>
+              <span className="text-slate-900 dark:text-white font-bold">Pemberitahuan Balasan Komentar</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setReplyNotificationPopup(null)}
+              className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 p-0.5 rounded-lg transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-sm">close</span>
+            </button>
+          </div>
+
+          <div className="space-y-1.5">
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <strong className="text-[#006194] dark:text-cyan-400 font-bold">{replyNotificationPopup.senderName}</strong> membalas komentar <strong className="text-[#006194] dark:text-cyan-400 font-bold">{replyNotificationPopup.targetAuthor}</strong>:
+            </p>
+            <div className="p-3 bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed shadow-sm">
+              {replyNotificationPopup.message}
             </div>
           </div>
         </div>

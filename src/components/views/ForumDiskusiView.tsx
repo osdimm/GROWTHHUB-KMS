@@ -462,26 +462,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
   return body.length > 0 ? `@${targetAuthor} ${body}` : `@${targetAuthor}`;
 };
 
-  const [replyNotificationPopup, setReplyNotificationPopup] = useState<{
-    targetAuthor: string;
-    senderName: string;
-    message: string;
-  } | null>(null);
 
-  const triggerReplyPopup = (targetAuthor: string, senderName: string, fullMessage: string) => {
-    // Only show popup alert IF the logged-in user IS the recipient of the reply (targetAuthor)!
-    // If the logged-in user is the sender, do not popup to themselves.
-    if (targetAuthor.toLowerCase() === currentUserName.toLowerCase()) {
-      setReplyNotificationPopup({
-        targetAuthor,
-        senderName,
-        message: fullMessage
-      });
-      setTimeout(() => {
-        setReplyNotificationPopup(null);
-      }, 8000);
-    }
-  };
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -513,7 +494,6 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
 
       finalMainContent = formatCleanTaggedMessage(rawMainText, targetAuthor);
       triggerToast(`Tanggapan Anda telah dikirim ke @${targetAuthor}.`);
-      triggerReplyPopup(targetAuthor, currentUserName, finalMainContent);
     } else {
       triggerToast('Tanggapan Anda telah dipublikasikan.');
     }
@@ -566,9 +546,6 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
 
     // Toast notification for the sender
     triggerToast(`Balasan Anda berhasil dikirim ke @${targetAuthor}.`);
-
-    // Popup notification target check (will trigger for targetAuthor recipient)
-    triggerReplyPopup(targetAuthor, currentUserName, formattedText);
 
     setInlineReplyText('');
     setActiveReplyId(null);
@@ -1005,33 +982,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
         </div>
       )}
 
-      {/* Instant Reply Notification Popup Alert (Theme-Aware) */}
-      {replyNotificationPopup && (
-        <div className="fixed top-6 right-6 z-50 max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl dark:shadow-cyan-950/40 p-4 space-y-3 animate-in slide-in-from-top-5 duration-200">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-            <div className="flex items-center gap-2 text-[#006194] dark:text-cyan-400 font-extrabold text-xs">
-              <span className="material-symbols-outlined text-lg">question_answer</span>
-              <span className="text-slate-900 dark:text-white font-bold">Pemberitahuan Balasan Komentar</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setReplyNotificationPopup(null)}
-              className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 p-0.5 rounded-lg transition-colors"
-            >
-              <span className="material-symbols-outlined text-sm">close</span>
-            </button>
-          </div>
 
-          <div className="space-y-1.5">
-            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              <strong className="text-[#006194] dark:text-cyan-400 font-bold">{replyNotificationPopup.senderName}</strong> membalas komentar <strong className="text-[#006194] dark:text-cyan-400 font-bold">{replyNotificationPopup.targetAuthor}</strong>:
-            </p>
-            <div className="p-3 bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed shadow-sm">
-              {replyNotificationPopup.message}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Toast */}
       {toastMessage && (
