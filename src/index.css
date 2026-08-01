@@ -51,62 +51,225 @@
   box-shadow: 0px 12px 32px rgba(15, 23, 42, 0.12);
 }
 
-/* ================= ELEGANT DARK MODE OVERRIDES ================= */
-html.dark body {
-  background-color: #0b132b !important;
-  color: #f8fafc !important;
+/* ================= NEON CYBERPUNK DARK MODE VARIABLES ================= */
+:root {
+  --bg-base: #0A0A0F;
+  --bg-surface: #12121A;
+  --bg-surface-hover: #1A1A24;
+  --bg-elevated: #1E1E2A;
+
+  --neon-cyan: #00F0FF;
+  --neon-magenta: #FF2E9A;
+  --neon-violet: #B026FF;
+  --neon-lime: #D4FF00;
+
+  --text-primary: #F0F0F5;
+  --text-secondary: #9494A8;
+  --text-muted: #5C5C70;
+
+  --border-subtle: #24242E;
+  --border-glow: rgba(0, 240, 255, 0.4);
 }
 
+/* ================= NEON CYBERPUNK STYLING RULES ================= */
 html.dark {
   color-scheme: dark;
 }
 
+html.dark body {
+  background-color: var(--bg-base) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Base Surfaces & Background Overrides */
+html.dark main {
+  background-color: var(--bg-base) !important;
+}
+
+html.dark [class*="bg-[#f7f9fb]"] {
+  background-color: var(--bg-base) !important;
+}
+
 html.dark .bg-white {
-  background-color: #151d36 !important;
-  color: #f8fafc !important;
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-subtle) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 html.dark .bg-slate-50,
 html.dark .bg-slate-50\/50,
-html.dark .bg-slate-100 {
-  background-color: #1d2847 !important;
-  color: #e2e8f0 !important;
+html.dark .bg-slate-100,
+html.dark .bg-slate-100\/80 {
+  background-color: var(--bg-surface-hover) !important;
+  color: var(--text-primary) !important;
 }
 
 html.dark .border-slate-200,
 html.dark .border-slate-100,
-html.dark .border-slate-300 {
-  border-color: #273554 !important;
+html.dark .border-slate-300,
+html.dark .border-slate-200\/80 {
+  border-color: var(--border-subtle) !important;
 }
 
+/* Typography Overrides */
 html.dark .text-slate-900,
 html.dark .text-slate-800,
 html.dark .text-slate-700 {
-  color: #f8fafc !important;
+  color: var(--text-primary) !important;
 }
 
 html.dark .text-slate-600,
 html.dark .text-slate-500 {
-  color: #94a3b8 !important;
+  color: var(--text-secondary) !important;
 }
 
+html.dark .text-slate-400 {
+  color: var(--text-muted) !important;
+}
+
+/* Header & Sidebar Cyberpunk Styling */
 html.dark header {
-  background-color: #0f172a !important;
-  border-color: #1e293b !important;
+  background-color: rgba(18, 18, 26, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  box-shadow: 0 4px 24px rgba(0, 240, 255, 0.08) !important;
 }
 
-html.dark table thead tr {
-  background-color: #1e2942 !important;
-  color: #cbd5e1 !important;
+html.dark aside {
+  background-color: var(--bg-surface) !important;
+  border-right: 1px solid var(--border-subtle) !important;
 }
 
+/* Sidebar Active Menu Item Cyberpunk Glow */
+html.dark aside nav button.bg-white\/10 {
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.15) 0%, rgba(176, 38, 255, 0.05) 100%) !important;
+  border-left: 3px solid var(--neon-cyan) !important;
+  color: var(--neon-cyan) !important;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.25) !important;
+}
+
+html.dark aside nav button.bg-white\/10 span.material-symbols-outlined {
+  color: var(--neon-cyan) !important;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.6) !important;
+}
+
+/* Cyberpunk Card Hover Glow Effects */
+html.dark [class*="hover:border-[#006194]"]:hover,
+html.dark [class*="hover:shadow-md"]:hover,
+html.dark [class*="hover:border-slate-300"]:hover,
+html.dark div.bg-white.rounded-2xl:hover {
+  border-color: rgba(0, 240, 255, 0.5) !important;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.2), 0 0 32px rgba(176, 38, 255, 0.1) !important;
+  transition: all 250ms ease-in-out !important;
+}
+
+/* Cyberpunk Stat Card Numbers Glow */
+html.dark .text-3xl.font-extrabold.text-slate-900,
+html.dark .text-2xl.font-extrabold.text-slate-900,
+html.dark .text-4xl.font-black {
+  color: var(--neon-cyan) !important;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5) !important;
+}
+
+html.dark .text-amber-600,
+html.dark .text-rose-600,
+html.dark [class*="text-[#FF2E9A]"] {
+  color: var(--neon-magenta) !important;
+  text-shadow: 0 0 10px rgba(255, 46, 154, 0.5) !important;
+}
+
+/* Icon Glows */
+html.dark .w-12.h-12.rounded-2xl,
+html.dark .w-10.h-10.rounded-xl {
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.2) !important;
+}
+
+/* Primary Cyberpunk Buttons */
+html.dark button[class*="bg-[#006194]"],
+html.dark a[class*="bg-[#006194]"],
+html.dark [class*="bg-[#006194]"] {
+  background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-violet) 100%) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.35), 0 0 28px rgba(176, 38, 255, 0.2) !important;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+html.dark button[class*="bg-[#006194]"]:hover,
+html.dark a[class*="bg-[#006194]"]:hover {
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.55), 0 0 36px rgba(176, 38, 255, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Cyberpunk Badges */
+html.dark .bg-sky-50,
+html.dark .bg-sky-100 {
+  background-color: rgba(0, 240, 255, 0.12) !important;
+  color: var(--neon-cyan) !important;
+  border: 1px solid rgba(0, 240, 255, 0.3) !important;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.2) !important;
+}
+
+html.dark .bg-amber-50,
+html.dark .bg-amber-100 {
+  background-color: rgba(255, 46, 154, 0.12) !important;
+  color: var(--neon-magenta) !important;
+  border: 1px solid rgba(255, 46, 154, 0.3) !important;
+  box-shadow: 0 0 8px rgba(255, 46, 154, 0.2) !important;
+}
+
+html.dark .bg-emerald-50,
+html.dark .bg-emerald-100 {
+  background-color: rgba(212, 255, 0, 0.12) !important;
+  color: var(--neon-lime) !important;
+  border: 1px solid rgba(212, 255, 0, 0.3) !important;
+  box-shadow: 0 0 8px rgba(212, 255, 0, 0.2) !important;
+}
+
+/* Cyberpunk Modals & Elevated Elements */
+html.dark div.fixed.inset-0 > div.bg-white,
+html.dark .bg-slate-900,
+html.dark [class*="bg-[#1e293b]"] {
+  background-color: var(--bg-elevated) !important;
+  border: 1px solid rgba(0, 240, 255, 0.3) !important;
+  box-shadow: 0 0 32px rgba(0, 240, 255, 0.15), 0 0 64px rgba(176, 38, 255, 0.1) !important;
+}
+
+/* Cyberpunk Inputs & Selects */
 html.dark input[type="text"],
 html.dark input[type="password"],
 html.dark input[type="email"],
 html.dark select,
 html.dark textarea {
-  background-color: #1e2942 !important;
-  border-color: #334155 !important;
-  color: #f8fafc !important;
+  background-color: var(--bg-surface-hover) !important;
+  border: 1px solid var(--border-subtle) !important;
+  color: var(--text-primary) !important;
+  transition: all 200ms ease !important;
+}
+
+html.dark input[type="text"]:focus,
+html.dark input[type="password"]:focus,
+html.dark input[type="email"]:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3) !important;
+  outline: none !important;
+}
+
+/* Cyberpunk Custom Scrollbar */
+html.dark ::-webkit-scrollbar-track {
+  background: var(--bg-base) !important;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.3) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.4) !important;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-cyan) !important;
 }
 
