@@ -965,7 +965,7 @@ export const HandoverRotasiView: React.FC<HandoverRotasiViewProps> = ({
                   setShowManagePeriodsModal(false);
                   setEditingPeriodOldName(null);
                 }}
-                className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 shadow-sm"
+                className="px-5 py-2.5 bg-[#006194] text-white rounded-xl text-xs font-bold hover:bg-[#004b73] shadow-sm"
               >
                 Selesai
               </button>

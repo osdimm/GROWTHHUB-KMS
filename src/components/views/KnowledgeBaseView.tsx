@@ -474,8 +474,8 @@ export const KnowledgeBaseView: React.FC<KnowledgeBaseViewProps> = ({
             onClick={() => setSelectedCategoryFilter('Semua')}
             className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               selectedCategoryFilter === 'Semua'
-                ? 'bg-slate-900 text-white'
-                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                ? 'bg-[#006194] text-white shadow-sm'
+                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             Semua Divisi
@@ -752,7 +752,7 @@ export const KnowledgeBaseView: React.FC<KnowledgeBaseViewProps> = ({
                   setShowAddCategoryModal(false);
                   setEditingCategoryId(null);
                 }}
-                className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 shadow-sm"
+                className="px-5 py-2.5 bg-[#006194] text-white rounded-xl text-xs font-bold hover:bg-[#004b73] shadow-sm"
               >
                 Selesai
               </button>
@@ -987,17 +987,17 @@ export const KnowledgeBaseView: React.FC<KnowledgeBaseViewProps> = ({
             </div>
 
             {/* Live Interactive In-App Document Reader Window */}
-            <div className="mb-5 border border-slate-300 rounded-2xl overflow-hidden shadow-lg bg-slate-900">
-              <div className="bg-slate-800 text-white px-4 py-2.5 flex items-center justify-between text-xs font-medium border-b border-slate-700">
+            <div className="mb-5 border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden shadow-lg bg-white dark:bg-slate-900">
+              <div className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white px-4 py-2.5 flex items-center justify-between text-xs font-medium border-b border-slate-200 dark:border-slate-700">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-emerald-400 text-[18px]">auto_stories</span>
+                  <span className="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[18px]">auto_stories</span>
                   <span className="font-bold tracking-wide">Pembaca Dokumen Langsung (In-App Reader)</span>
-                  <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-[10px] font-bold">
+                  <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30 rounded-full text-[10px] font-bold">
                     ✨ Tanpa Unduh
                   </span>
                 </div>
-                <div className="flex items-center gap-3 text-[11px] text-slate-300 font-mono">
-                  <span className="bg-slate-700/80 px-2 py-0.5 rounded text-slate-200">Format: {previewArticle.fileType}</span>
+                <div className="flex items-center gap-3 text-[11px] text-slate-600 dark:text-slate-300 font-mono">
+                  <span className="bg-slate-200 dark:bg-slate-700/80 px-2 py-0.5 rounded text-slate-800 dark:text-slate-200">Format: {previewArticle.fileType}</span>
                 </div>
               </div>
 
