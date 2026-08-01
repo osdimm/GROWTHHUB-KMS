@@ -710,15 +710,7 @@ export const HandoverRotasiView: React.FC<HandoverRotasiViewProps> = ({
                 </div>
               )}
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                <button
-                  type="button"
-                  disabled={isUploading}
-                  onClick={() => setShowUploadModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-50"
-                >
-                  Batal
-                </button>
+              <div className="flex justify-end pt-4 border-t border-slate-100">
                 <button
                   type="submit"
                   disabled={isUploading}

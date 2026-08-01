@@ -180,7 +180,7 @@ export const DataPenggunaView: React.FC<DataPenggunaViewProps> = ({
         role = 'Karyawan';
       }
 
-      const password = '9rowthhub';
+      const password = 'password123';
 
       let valid = true;
       let errorNote = undefined;
@@ -265,6 +265,12 @@ export const DataPenggunaView: React.FC<DataPenggunaViewProps> = ({
       return;
     }
 
+    const todayStr = new Date().toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+
     validUsers.forEach((pu, idx) => {
       const initials = pu.name
         .split(' ')
@@ -280,47 +286,54 @@ export const DataPenggunaView: React.FC<DataPenggunaViewProps> = ({
         email: pu.email,
         role: pu.role,
         division: pu.division,
-        password: '9rowthhub',
-        mustChangePassword: true,
         status: 'Aktif',
-        joinDate: new Date().toLocaleDateString('id-ID', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric'
-        }),
-        initials
+        joinDate: todayStr,
+        initials,
+        password: 'password123',
+        mustChangePassword: true
       };
-
       onAddUser(newUser);
     });
 
-    setShowImportModal(false);
     setParsedUsers([]);
+    setShowImportModal(false);
     setImportFileName('');
     setImportError(null);
 
-    triggerToast(`Berhasil mengimpor ${validUsers.length} pengguna sekaligus dengan password default '9rowthhub'!`);
+    triggerToast(`Berhasil mengimpor ${validUsers.length} pengguna sekaligus dengan password default 'password123'!`);
   };
 
-  const handleCreateUserSubmit = (e: React.FormEvent) => {
+  const handleAddUserSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName || !newEmail) return;
+    setAddUserError(null);
 
-    const trimmedEmail = newEmail.trim();
-    const isDuplicate = users.some(
-      (u) => u.email.trim().toLowerCase() === trimmedEmail.toLowerCase()
-    );
-
-    if (isDuplicate) {
-      const errorMsg = `Email "${trimmedEmail}" sudah terdaftar dalam sistem. Data tidak dapat disimpan.`;
-      setAddUserError(errorMsg);
-      triggerToast(`⚠️ ${errorMsg}`);
+    if (!newName.trim()) {
+      setAddUserError('Nama pengguna wajib diisi.');
       return;
     }
 
-    setAddUserError(null);
-    const initials = newName
+    if (!newEmail.trim() || !newEmail.includes('@')) {
+      setAddUserError('Format email tidak valid.');
+      return;
+    }
+
+    const emailExists = users.some(
+      (u) => u.email.toLowerCase() === newEmail.trim().toLowerCase()
+    );
+    if (emailExists) {
+      setAddUserError('Email sudah terdaftar di sistem.');
+      return;
+    }
+
+    const todayStr = new Date().toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    const initials = newName.trim()
       .split(' ')
+      .filter(Boolean)
       .map((n) => n[0])
       .join('')
       .substring(0, 2)
@@ -328,26 +341,26 @@ export const DataPenggunaView: React.FC<DataPenggunaViewProps> = ({
 
     const newUser: User = {
       id: `u-${Date.now()}`,
-      name: newName,
-      email: trimmedEmail,
+      name: newName.trim(),
+      email: newEmail.trim().toLowerCase(),
       role: newRole,
       division: newDivision,
-      password: '9rowthhub',
-      mustChangePassword: true,
       status: 'Aktif',
-      joinDate: new Date().toLocaleDateString('id-ID', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      }),
-      initials
+      joinDate: todayStr,
+      initials,
+      password: 'password123',
+      mustChangePassword: true
     };
 
     onAddUser(newUser);
     setShowAddModal(false);
     setNewName('');
     setNewEmail('');
-    triggerToast(`Pengguna ${newUser.name} berhasil ditambahkan dengan password default '9rowthhub'. User akan diminta ubah password.`);
+    setNewRole('Karyawan');
+    setNewDivision('Talent Development');
+    setAddUserError(null);
+
+    triggerToast(`Pengguna ${newUser.name} berhasil ditambahkan dengan password default 'password123'. User akan diminta ubah password.`);
   };
 
   const handleOpenEditModal = (user: User) => {
@@ -629,7 +642,7 @@ export const DataPenggunaView: React.FC<DataPenggunaViewProps> = ({
               </button>
             </div>
 
-            <form onSubmit={handleCreateUserSubmit} className="space-y-4">
+            <form onSubmit={handleAddUserSubmit} className="space-y-4">
               {addUserError && (
                 <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 flex items-center gap-2 animate-in fade-in">
                   <span className="material-symbols-outlined text-rose-600 text-base shrink-0">error</span>
@@ -703,14 +716,7 @@ export const DataPenggunaView: React.FC<DataPenggunaViewProps> = ({
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
-                >
-                  Batal
-                </button>
+              <div className="flex justify-end pt-4 border-t border-slate-100">
                 <button
                   type="submit"
                   className="px-5 py-2 rounded-xl text-xs font-bold bg-[#006194] text-white hover:bg-[#004b73] transition-all"
@@ -782,7 +788,7 @@ export const DataPenggunaView: React.FC<DataPenggunaViewProps> = ({
                     Divisi
                   </div>
                   <div className="bg-amber-50 p-2 rounded-lg border border-amber-200 text-center font-bold text-amber-900">
-                    Password <span className="text-[10px] text-amber-700">(9rowthhub)</span>
+                    Password <span className="text-[10px] text-amber-700">(password123)</span>
                   </div>
                 </div>
               </div>
@@ -826,7 +832,7 @@ export const DataPenggunaView: React.FC<DataPenggunaViewProps> = ({
                       Pratinjau Peserta Hasil Impor ({parsedUsers.length} data)
                     </span>
                     <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-bold">
-                      Password Default: 9rowthhub
+                      Password Default: password123
                     </span>
                   </div>
 
@@ -865,7 +871,7 @@ export const DataPenggunaView: React.FC<DataPenggunaViewProps> = ({
                             </td>
                             <td className="px-3 py-2.5">
                               <span className="px-2 py-0.5 bg-amber-100 text-amber-900 font-bold rounded text-[10px] font-mono">
-                                9rowthhub
+                                password123
                               </span>
                             </td>
                             <td className="px-3 py-2.5 text-center">
@@ -907,19 +913,7 @@ export const DataPenggunaView: React.FC<DataPenggunaViewProps> = ({
                   ? `${parsedUsers.filter((u) => u.valid).length} pengguna siap diimpor`
                   : 'Pilih file Excel/CSV untuk memulai.'}
               </span>
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowImportModal(false);
-                    setParsedUsers([]);
-                    setImportFileName('');
-                    setImportError(null);
-                  }}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
-                >
-                  Batal
-                </button>
+              <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={handleConfirmImport}
@@ -1020,14 +1014,7 @@ export const DataPenggunaView: React.FC<DataPenggunaViewProps> = ({
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setEditUserTarget(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
-                >
-                  Batal
-                </button>
+              <div className="flex justify-end pt-4 border-t border-slate-100">
                 <button
                   type="submit"
                   className="px-5 py-2 rounded-xl text-xs font-bold bg-[#006194] text-white hover:bg-[#004b73] transition-all"

@@ -773,7 +773,7 @@ export default function App() {
               <div>
                 <strong className="block text-sm font-bold text-white">⚠️ PERINGATAN UBAH PASSWORD PAKSA</strong>
                 <span className="text-amber-50">
-                  Akun Anda ditambahkan oleh Admin dengan password default (<strong>9rowthhub</strong>). Demi keamanan akun Anda, silakan ubah kata sandi sekarang.
+                  Akun Anda ditambahkan oleh Admin dengan password default (<strong>password123</strong>). Demi keamanan akun Anda, silakan ubah kata sandi sekarang.
                 </span>
               </div>
             </div>
@@ -927,7 +927,7 @@ export default function App() {
 
             <div className="space-y-2.5 text-xs text-slate-600 leading-relaxed bg-amber-50/60 p-4 rounded-xl border border-amber-200/80">
               <p>
-                Halo <strong>{currentUser.name}</strong>, akun Anda telah ditambahkan oleh Admin dengan kata sandi default (<code className="bg-amber-200/80 text-amber-950 px-1.5 py-0.5 rounded font-mono font-bold">9rowthhub</code>).
+                Halo <strong>{currentUser.name}</strong>, akun Anda telah ditambahkan oleh Admin dengan kata sandi default (<code className="bg-amber-200/80 text-amber-950 px-1.5 py-0.5 rounded font-mono font-bold">password123</code>).
               </p>
               <p className="text-slate-600">
                 Demi menjaga kerahasiaan & keamanan data internal KMS Growth Hub, Anda <strong>diwajibkan untuk mengganti kata sandi bawaan ini</strong> dengan kata sandi pribadi Anda di menu <strong>Profil Pengguna</strong>.

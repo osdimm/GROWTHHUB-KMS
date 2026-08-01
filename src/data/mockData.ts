@@ -20,7 +20,7 @@ export const initialUsers: User[] = [
     status: 'Aktif',
     joinDate: '12 Okt 2023',
     initials: 'DP',
-    password: '9rowthhub'
+    password: 'password123'
   },
   {
     id: 'u-manajer',
@@ -31,7 +31,7 @@ export const initialUsers: User[] = [
     status: 'Aktif',
     joinDate: '10 Mar 2023',
     initials: 'AD',
-    password: '9rowthhub'
+    password: 'password123'
   },
   {
     id: 'u-karyawan',
@@ -42,7 +42,7 @@ export const initialUsers: User[] = [
     status: 'Aktif',
     joinDate: '05 Jan 2024',
     initials: 'AR',
-    password: '9rowthhub'
+    password: 'password123'
   },
   {
     id: 'u-associate',
@@ -53,7 +53,7 @@ export const initialUsers: User[] = [
     status: 'Aktif',
     joinDate: '12 Jan 2024',
     initials: 'RW',
-    password: '9rowthhub',
+    password: 'password123',
     mustChangePassword: true
   },
   {
@@ -65,7 +65,7 @@ export const initialUsers: User[] = [
     status: 'Aktif',
     joinDate: '10 Mar 2023',
     initials: 'AS',
-    password: '9rowthhub'
+    password: 'password123'
   },
   {
     id: 'u-6',
@@ -76,7 +76,7 @@ export const initialUsers: User[] = [
     status: 'Aktif',
     joinDate: '18 Agu 2023',
     initials: 'DP',
-    password: '9rowthhub'
+    password: 'password123'
   },
   {
     id: 'u-7',
@@ -87,7 +87,7 @@ export const initialUsers: User[] = [
     status: 'Aktif',
     joinDate: '01 Des 2023',
     initials: 'RK',
-    password: '9rowthhub'
+    password: 'password123'
   },
   {
     id: 'u-8',
@@ -98,7 +98,7 @@ export const initialUsers: User[] = [
     status: 'Aktif',
     joinDate: '12 Jan 2024',
     initials: 'SM',
-    password: '9rowthhub'
+    password: 'password123'
   },
   {
     id: 'u-9',
@@ -109,7 +109,7 @@ export const initialUsers: User[] = [
     status: 'Aktif',
     joinDate: '15 Jul 2022',
     initials: 'BP',
-    password: '9rowthhub'
+    password: 'password123'
   },
   {
     id: 'u-10',
@@ -120,7 +120,7 @@ export const initialUsers: User[] = [
     status: 'Aktif',
     joinDate: '04 Mei 2023',
     initials: 'AN',
-    password: '9rowthhub'
+    password: 'password123'
   },
   {
     id: 'u-11',
@@ -131,7 +131,7 @@ export const initialUsers: User[] = [
     status: 'Aktif',
     joinDate: '20 Sep 2023',
     initials: 'LW',
-    password: '9rowthhub'
+    password: 'password123'
   },
   {
     id: 'u-12',
@@ -142,7 +142,7 @@ export const initialUsers: User[] = [
     status: 'Aktif',
     joinDate: '11 Nov 2023',
     initials: 'DS',
-    password: '9rowthhub'
+    password: 'password123'
   }
 ];
 

@@ -588,13 +588,7 @@ ${popularDocs.map((d) => `${d.rank}. ${d.title} (${d.views} views, ${d.downloads
               </div>
             </div>
 
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowExportModal(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
-              >
-                Batal
-              </button>
+            <div className="flex justify-end">
               <button
                 onClick={handleConfirmExport}
                 className="px-5 py-2.5 bg-[#006194] text-white rounded-xl text-xs font-bold hover:bg-[#004b73]"

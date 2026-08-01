@@ -40,7 +40,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           return;
         }
 
-        const expectedPassword = matchedUser.password || '9rowthhub';
+        const expectedPassword = matchedUser.password || 'password123';
         if (passwordInput !== expectedPassword) {
           setLoginError('Kata sandi yang Anda masukkan salah. Silakan periksa kembali kata sandi Anda.');
           return;

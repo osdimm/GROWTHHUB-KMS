@@ -20,11 +20,11 @@ export const ProfilPenggunaView: React.FC<ProfilPenggunaViewProps> = ({
   const [tempAvatar, setTempAvatar] = useState(currentUser.avatar || '');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isDefaultPass = !currentUser.password || currentUser.password === '9rowthhub' || currentUser.mustChangePassword;
-  const actualCurrentPassword = currentUser.password || '9rowthhub';
+  const isDefaultPass = !currentUser.password || currentUser.password === 'password123' || currentUser.mustChangePassword;
+  const actualCurrentPassword = currentUser.password || 'password123';
 
   // Password reset fields
-  const [oldPassword, setOldPassword] = useState(isDefaultPass ? '9rowthhub' : '');
+  const [oldPassword, setOldPassword] = useState(isDefaultPass ? 'password123' : '');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showOldPass, setShowOldPass] = useState(false);
@@ -38,7 +38,7 @@ export const ProfilPenggunaView: React.FC<ProfilPenggunaViewProps> = ({
     setAvatarUrl(currentUser.avatar || '');
     setTempAvatar(currentUser.avatar || '');
     if (isDefaultPass && !oldPassword) {
-      setOldPassword('9rowthhub');
+      setOldPassword('password123');
     }
   }, [currentUser, isDefaultPass]);
 
@@ -56,10 +56,10 @@ export const ProfilPenggunaView: React.FC<ProfilPenggunaViewProps> = ({
     const isChangingPassword = !!(oldPassword || newPassword || confirmPassword || isDefaultPass);
 
     if (isChangingPassword) {
-      // 1. Verifikasi Kata Sandi Saat Ini (9rowthhub atau password terbaru)
+      // 1. Verifikasi Kata Sandi Saat Ini (password123 atau password terbaru)
       const isValidOldPass =
         oldPassword === actualCurrentPassword ||
-        oldPassword === '9rowthhub' ||
+        oldPassword === 'password123' ||
         (currentUser.password && oldPassword === currentUser.password);
 
       if (!oldPassword || !isValidOldPass) {
@@ -80,8 +80,8 @@ export const ProfilPenggunaView: React.FC<ProfilPenggunaViewProps> = ({
       }
 
       // 4. Verifikasi Tidak Sama dengan Kata Sandi Default
-      if (isDefaultPass && newPassword === '9rowthhub') {
-        triggerToast('⚠️ Kata sandi baru tidak boleh sama dengan kata sandi default ("9rowthhub").');
+      if (isDefaultPass && newPassword === 'password123') {
+        triggerToast('⚠️ Kata sandi baru tidak boleh sama dengan kata sandi default ("password123").');
         return;
       }
 
@@ -305,7 +305,7 @@ export const ProfilPenggunaView: React.FC<ProfilPenggunaViewProps> = ({
                 <span>⚠️ PERINGATAN PAKSA: Ubah Kata Sandi Akun Baru Anda</span>
               </span>
               <p>
-                Akun Anda ditambahkan oleh Administrator dengan kata sandi bawaan (<strong className="bg-amber-200/80 px-1.5 py-0.5 rounded font-mono text-amber-950">9rowthhub</strong>). Demi menjaga keamanan data KMS Growth Hub, Anda <strong>wajib mengganti kata sandi</strong> dengan kata sandi rahasia pribadi Anda pada formulir di bawah ini.
+                Akun Anda ditambahkan oleh Administrator dengan kata sandi bawaan (<strong className="bg-amber-200/80 px-1.5 py-0.5 rounded font-mono text-amber-950">password123</strong>). Demi menjaga keamanan data KMS Growth Hub, Anda <strong>wajib mengganti kata sandi</strong> dengan kata sandi rahasia pribadi Anda pada formulir di bawah ini.
               </p>
             </div>
           </div>
