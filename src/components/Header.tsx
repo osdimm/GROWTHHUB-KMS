@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavigationTab, User, UserRole, AppNotification } from '../types';
+import { ThemeMode } from './Sidebar';
 
 interface HeaderProps {
   title?: string;
@@ -13,6 +14,8 @@ interface HeaderProps {
   notifications?: AppNotification[];
   onClearNotifications?: () => void;
   activeTab?: NavigationTab;
+  themeMode?: ThemeMode;
+  setThemeMode?: (mode: ThemeMode) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -26,13 +29,17 @@ export const Header: React.FC<HeaderProps> = ({
   onSwitchUserRole,
   notifications = [],
   onClearNotifications,
-  activeTab
+  activeTab,
+  themeMode = 'system',
+  setThemeMode
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showThemeMenu, setShowThemeMenu] = useState(false);
 
   const notifRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+  const themeRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -66,8 +73,8 @@ export const Header: React.FC<HeaderProps> = ({
       if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
         setShowNotifications(false);
       }
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
-        setShowProfileMenu(false);
+      if (themeRef.current && !themeRef.current.contains(event.target as Node)) {
+        setShowThemeMenu(false);
       }
     };
 
@@ -219,6 +226,68 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
                 </div>
               )}
+            </div>
+          )}
+        </div>
+
+        {/* Single Dynamic Theme Dropdown Button */}
+        <div className="relative" ref={themeRef}>
+          <button
+            type="button"
+            onClick={() => setShowThemeMenu(!showThemeMenu)}
+            className="p-2 text-slate-600 dark:text-slate-300 hover:text-[#006194] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all flex items-center gap-0.5 border border-slate-200 dark:border-slate-700"
+            title={`Mode Tampilan: ${themeMode === 'light' ? 'Light' : themeMode === 'dark' ? 'Dark' : 'System'}`}
+          >
+            <span className="material-symbols-outlined text-[20px] text-amber-500">
+              {themeMode === 'light' ? 'light_mode' : themeMode === 'dark' ? 'dark_mode' : 'desktop_windows'}
+            </span>
+            <span className="material-symbols-outlined text-[14px] text-slate-400">expand_more</span>
+          </button>
+
+          {showThemeMenu && (
+            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-1.5 z-50 animate-in fade-in duration-150 text-xs">
+              <div className="px-2 py-1 text-[10px] font-extrabold uppercase text-slate-400 border-b border-slate-100 dark:border-slate-800 mb-1">
+                Pilihan Mode Tampilan
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (setThemeMode) setThemeMode('light');
+                  setShowThemeMenu(false);
+                }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
+                  themeMode === 'light' ? 'bg-amber-50 text-amber-900 dark:bg-amber-500/20 dark:text-amber-300 border border-amber-200' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+              >
+                <span className="material-symbols-outlined text-base text-amber-500">light_mode</span>
+                <span>Light (Terang)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (setThemeMode) setThemeMode('dark');
+                  setShowThemeMenu(false);
+                }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
+                  themeMode === 'dark' ? 'bg-indigo-50 text-indigo-900 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+              >
+                <span className="material-symbols-outlined text-base text-indigo-500">dark_mode</span>
+                <span>Dark (Gelap)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (setThemeMode) setThemeMode('system');
+                  setShowThemeMenu(false);
+                }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
+                  themeMode === 'system' ? 'bg-sky-50 text-sky-900 dark:bg-sky-500/20 dark:text-sky-300 border border-sky-200' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+              >
+                <span className="material-symbols-outlined text-base text-sky-500">desktop_windows</span>
+                <span>System (Sistem)</span>
+              </button>
             </div>
           )}
         </div>

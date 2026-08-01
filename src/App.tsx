@@ -50,7 +50,7 @@ import {
   saveActivityToSupabase
 } from './services/supabaseService';
 
-import { Sidebar } from './components/Sidebar';
+import { Sidebar, ThemeMode } from './components/Sidebar';
 import { Header } from './components/Header';
 import { LogoutModal } from './components/LogoutModal';
 
@@ -91,6 +91,48 @@ export default function App() {
     return localStorage.getItem('kms_current_user_id') || 'u-admin';
   });
   const [showForcePasswordModal, setShowForcePasswordModal] = useState<boolean>(true);
+
+  // Theme Mode State (light | dark | system)
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    const saved = localStorage.getItem('kms_theme');
+    return (saved as ThemeMode) || 'system';
+  });
+
+  useEffect(() => {
+    const applyTheme = (mode: ThemeMode) => {
+      const root = document.documentElement;
+      let isDark = false;
+      if (mode === 'dark') {
+        isDark = true;
+      } else if (mode === 'light') {
+        isDark = false;
+      } else {
+        isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      }
+
+      if (isDark) {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+      localStorage.setItem('kms_theme', mode);
+    };
+
+    applyTheme(themeMode);
+
+    if (themeMode === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const listener = (e: MediaQueryListEvent) => {
+        if (e.matches) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      };
+      mediaQuery.addEventListener('change', listener);
+      return () => mediaQuery.removeEventListener('change', listener);
+    }
+  }, [themeMode]);
 
   // Save session state to sessionStorage & localStorage
   useEffect(() => {
@@ -798,6 +840,8 @@ export default function App() {
         isOpenMobile={isMobileSidebarOpen}
         setIsOpenMobile={setIsMobileSidebarOpen}
         currentUser={currentUser}
+        themeMode={themeMode}
+        setThemeMode={setThemeMode}
       />
 
       {/* Top Header */}
@@ -813,6 +857,8 @@ export default function App() {
         notifications={userNotifications}
         onClearNotifications={handleClearNotifications}
         activeTab={activeTab}
+        themeMode={themeMode}
+        setThemeMode={setThemeMode}
       />
 
       {/* Main App Container */}

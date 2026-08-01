@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { NavigationTab, User } from '../types';
 import { GrowthHubLogo } from './GrowthHubLogo';
+
+export type ThemeMode = 'light' | 'dark' | 'system';
 
 interface SidebarProps {
   activeTab: NavigationTab;
@@ -9,6 +11,8 @@ interface SidebarProps {
   isOpenMobile?: boolean;
   setIsOpenMobile?: (open: boolean) => void;
   currentUser?: User;
+  themeMode?: ThemeMode;
+  setThemeMode?: (mode: ThemeMode) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -17,8 +21,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLogoutClick,
   isOpenMobile,
   setIsOpenMobile,
-  currentUser
+  currentUser,
+  themeMode = 'system',
+  setThemeMode
 }) => {
+  const [showThemeMenu, setShowThemeMenu] = useState(false);
+  const themeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (themeRef.current && !themeRef.current.contains(e.target as Node)) {
+        setShowThemeMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const userRole = currentUser?.role || 'Admin';
 
   const allNavItems: { id: NavigationTab; label: string; icon: string; badge?: string; roles: string[] }[] = [
@@ -112,13 +131,76 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </nav>
 
-        {/* Logout Section */}
-        <div className="px-4 mt-auto pt-4 border-t border-white/10">
+        {/* Theme & Logout Section */}
+        <div className="px-3 mt-auto pt-4 border-t border-white/10 flex items-center justify-between gap-2">
+          {/* Single Dynamic Theme Dropdown Button */}
+          <div className="relative" ref={themeRef}>
+            <button
+              type="button"
+              onClick={() => setShowThemeMenu(!showThemeMenu)}
+              className="p-2.5 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl transition-all flex items-center gap-1 border border-white/10"
+              title={`Mode Tampilan: ${themeMode === 'light' ? 'Light' : themeMode === 'dark' ? 'Dark' : 'System'}`}
+            >
+              <span className="material-symbols-outlined text-[20px] text-amber-400">
+                {themeMode === 'light' ? 'light_mode' : themeMode === 'dark' ? 'dark_mode' : 'desktop_windows'}
+              </span>
+              <span className="material-symbols-outlined text-[14px] text-slate-400">expand_more</span>
+            </button>
+
+            {showThemeMenu && (
+              <div className="absolute bottom-12 left-0 w-48 bg-[#1e293b] border border-slate-700/80 rounded-2xl shadow-2xl p-1.5 z-50 animate-in fade-in duration-150 text-xs">
+                <div className="px-2 py-1 text-[10px] font-extrabold uppercase text-slate-400 border-b border-slate-800 mb-1">
+                  Pilihan Mode Tampilan
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (setThemeMode) setThemeMode('light');
+                    setShowThemeMenu(false);
+                  }}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
+                    themeMode === 'light' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'text-slate-300 hover:bg-white/5'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base text-amber-400">light_mode</span>
+                  <span>Light (Terang)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (setThemeMode) setThemeMode('dark');
+                    setShowThemeMenu(false);
+                  }}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
+                    themeMode === 'dark' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'text-slate-300 hover:bg-white/5'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base text-indigo-400">dark_mode</span>
+                  <span>Dark (Gelap)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (setThemeMode) setThemeMode('system');
+                    setShowThemeMenu(false);
+                  }}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
+                    themeMode === 'system' ? 'bg-sky-500/20 text-sky-300 border border-sky-400/30' : 'text-slate-300 hover:bg-white/5'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base text-sky-400">desktop_windows</span>
+                  <span>System (Sistem)</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Logout Button */}
           <button
             onClick={onLogoutClick}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-colors text-sm font-medium"
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-colors text-xs font-bold border border-white/10"
           >
-            <span className="material-symbols-outlined text-[20px]">logout</span>
+            <span className="material-symbols-outlined text-[18px]">logout</span>
             <span>Logout</span>
           </button>
         </div>
