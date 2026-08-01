@@ -693,14 +693,33 @@ export default function App() {
     setForumTopics((prev) =>
       prev.map((t) => {
         if (t.id === topicId) {
-          const updatedComments = t.comments.filter((c) => c.id !== commentId);
+          const hasChildren = t.comments.some((c) => c.parentId === commentId);
+          let updatedComments: ForumComment[];
+
+          if (hasChildren) {
+            updatedComments = t.comments.map((c) => {
+              if (c.id === commentId) {
+                const softDeleted: ForumComment = {
+                  ...c,
+                  author: '[Dihapus]',
+                  content: '[Komentar telah dihapus]'
+                };
+                saveForumCommentToSupabase(topicId, softDeleted).catch(console.error);
+                return softDeleted;
+              }
+              return c;
+            });
+          } else {
+            updatedComments = t.comments.filter((c) => c.id !== commentId);
+            deleteForumCommentFromSupabase(commentId).catch(console.error);
+          }
+
           const updatedTopic = {
             ...t,
             comments: updatedComments,
             commentCount: updatedComments.length
           };
           saveForumTopicToSupabase(updatedTopic).catch(console.error);
-          deleteForumCommentFromSupabase(commentId).catch(console.error);
           return updatedTopic;
         }
         return t;

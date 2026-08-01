@@ -15,6 +15,292 @@ interface ForumDiskusiViewProps {
   currentUserId?: string;
 }
 
+interface CommentTreeNode extends ForumComment {
+  children: CommentTreeNode[];
+}
+
+// Helper: Convert flat comments array into hierarchical nested tree
+const buildCommentTree = (comments: ForumComment[]): CommentTreeNode[] => {
+  if (!comments || comments.length === 0) return [];
+
+  const map = new Map<string, CommentTreeNode>();
+  const roots: CommentTreeNode[] = [];
+
+  comments.forEach((c) => {
+    map.set(c.id, { ...c, children: [] });
+  });
+
+  comments.forEach((c) => {
+    const node = map.get(c.id)!;
+    if (c.parentId && map.has(c.parentId)) {
+      map.get(c.parentId)!.children.push(node);
+    } else {
+      roots.push(node);
+    }
+  });
+
+  // Sort top-level root comments: Pinned first, then chronological
+  roots.sort((a, b) => {
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+    return 0;
+  });
+
+  return roots;
+};
+
+interface CommentNodeItemProps {
+  node: CommentTreeNode;
+  depth: number;
+  activeTopicId: string;
+  currentUserRole: string;
+  currentUserName: string;
+  activeReplyId: string | null;
+  inlineReplyText: string;
+  collapsedSet: Set<string>;
+  onToggleReply: (commentId: string, authorName: string) => void;
+  onCancelReply: () => void;
+  onChangeInlineText: (text: string) => void;
+  onSubmitInlineReply: (parentId: string) => void;
+  onToggleCollapse: (commentId: string) => void;
+  onTogglePin?: (topicId: string, commentId: string) => void;
+  onDeleteComment?: (topicId: string, commentId: string) => void;
+}
+
+const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
+  node,
+  depth,
+  activeTopicId,
+  currentUserRole,
+  currentUserName,
+  activeReplyId,
+  inlineReplyText,
+  collapsedSet,
+  onToggleReply,
+  onCancelReply,
+  onChangeInlineText,
+  onSubmitInlineReply,
+  onToggleCollapse,
+  onTogglePin,
+  onDeleteComment
+}) => {
+  const isCollapsed = collapsedSet.has(node.id);
+  const isReplyingThis = activeReplyId === node.id;
+  const isDeleted = node.content === '[Komentar telah dihapus]' || node.author === '[Dihapus]';
+  const hasChildren = node.children && node.children.length > 0;
+
+  const canDelete =
+    !isDeleted &&
+    (currentUserRole === 'Admin' ||
+      (node.author && node.author.toLowerCase() === currentUserName.toLowerCase()));
+
+  return (
+    <div className={`space-y-2 relative ${depth > 0 ? 'mt-2' : 'mt-3'}`}>
+      {/* Main Comment Card */}
+      <div
+        className={`p-3.5 sm:p-4 rounded-xl border transition-all space-y-2 ${
+          node.isPinned
+            ? 'bg-amber-50/90 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/40 ring-1 ring-amber-300/50'
+            : isDeleted
+            ? 'bg-slate-100/70 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-800'
+            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800'
+        }`}
+      >
+        {/* Header Badges: Pinned & Collapse Control */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {node.isPinned && (
+              <span className="flex items-center gap-1 text-[11px] font-extrabold text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-500/20 px-2 py-0.5 rounded-md">
+                <span className="material-symbols-outlined text-xs">push_pin</span>
+                <span>Disematkan</span>
+              </span>
+            )}
+            {hasChildren && (
+              <button
+                type="button"
+                onClick={() => onToggleCollapse(node.id)}
+                className="text-[11px] font-bold text-slate-500 hover:text-[#006194] bg-slate-200/60 dark:bg-slate-700/60 px-2 py-0.5 rounded-md transition-colors flex items-center gap-1"
+                title={isCollapsed ? 'Tampilkan Balasan' : 'Sembunyikan Balasan'}
+              >
+                <span className="material-symbols-outlined text-xs">
+                  {isCollapsed ? 'add' : 'remove'}
+                </span>
+                <span>{isCollapsed ? `+${node.children.length} Balasan` : 'Collapse'}</span>
+              </button>
+            )}
+          </div>
+          <span className="text-[10px] text-slate-400 font-medium">{node.timestamp}</span>
+        </div>
+
+        {/* Comment Author Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            {node.avatar ? (
+              <img
+                src={node.avatar}
+                alt={node.author}
+                className="w-8 h-8 rounded-full object-cover border border-slate-200"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-900/60 text-[#006194] dark:text-sky-300 font-bold text-xs flex items-center justify-center border border-sky-200 dark:border-sky-800">
+                {node.initials || 'U'}
+              </div>
+            )}
+            <div>
+              <p className="font-bold text-slate-900 dark:text-white text-xs">{node.author}</p>
+              <p className="text-[10px] text-slate-500 font-medium">{node.authorRole}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Comment Body */}
+        <div className="pl-10">
+          {isDeleted ? (
+            <p className="text-xs text-slate-400 dark:text-slate-500 italic">
+              [Komentar telah dihapus]
+            </p>
+          ) : (
+            <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-line">
+              {node.content}
+            </p>
+          )}
+        </div>
+
+        {/* Action Controls (Reply, Pin, Delete) */}
+        {!isDeleted && (
+          <div className="flex items-center justify-end gap-1 pt-1 text-[11px]">
+            {/* Inline Reply Trigger */}
+            <button
+              type="button"
+              onClick={() => onToggleReply(node.id, node.author)}
+              className={`p-1.5 rounded-lg transition-all flex items-center justify-center ${
+                isReplyingThis
+                  ? 'bg-sky-100 text-[#006194] font-bold'
+                  : 'text-slate-500 hover:text-[#006194] hover:bg-slate-200/70 dark:hover:bg-slate-700'
+              }`}
+              title="Balas Diskusi (Inline)"
+            >
+              <span className="material-symbols-outlined text-[18px]">reply</span>
+            </button>
+
+            {/* Pin / Unpin Toggle */}
+            {onTogglePin && (
+              <button
+                type="button"
+                onClick={() => onTogglePin(activeTopicId, node.id)}
+                className={`p-1.5 rounded-lg transition-all flex items-center justify-center ${
+                  node.isPinned
+                    ? 'text-amber-700 bg-amber-100 hover:bg-amber-200'
+                    : 'text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40'
+                }`}
+                title={node.isPinned ? 'Lepas Sematan' : 'Sematkan Pesan'}
+              >
+                <span className="material-symbols-outlined text-[18px]">push_pin</span>
+              </button>
+            )}
+
+            {/* Delete Trigger */}
+            {canDelete && onDeleteComment && (
+              <button
+                type="button"
+                onClick={() => onDeleteComment(activeTopicId, node.id)}
+                className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-all flex items-center justify-center"
+                title="Hapus Balasan"
+              >
+                <span className="material-symbols-outlined text-[18px]">delete</span>
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Inline Reply Form (UX Reddit - Appears inline right below the comment!) */}
+      {isReplyingThis && (
+        <div className="ml-4 sm:ml-6 mt-2 p-3 bg-sky-50/70 dark:bg-slate-800/80 border border-sky-200 dark:border-slate-700 rounded-xl space-y-2 animate-in fade-in duration-150">
+          <div className="flex items-center justify-between text-xs text-[#006194] dark:text-sky-300 font-bold">
+            <span className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-sm">reply</span>
+              <span>Membalas @{node.author}</span>
+            </span>
+            <button
+              type="button"
+              onClick={onCancelReply}
+              className="text-slate-400 hover:text-rose-500 text-xs font-semibold"
+            >
+              Batal
+            </button>
+          </div>
+          <textarea
+            value={inlineReplyText}
+            onChange={(e) => onChangeInlineText(e.target.value)}
+            placeholder={`Tulis balasan Anda untuk @${node.author}...`}
+            rows={2}
+            className="w-full p-2.5 text-xs text-slate-800 dark:text-white bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-1 focus:ring-[#006194] resize-none"
+            autoFocus
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={onCancelReply}
+              className="px-3 py-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-700 rounded-lg text-xs font-semibold"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              onClick={() => onSubmitInlineReply(node.id)}
+              disabled={!inlineReplyText.trim()}
+              className="px-4 py-1.5 bg-[#006194] text-white rounded-lg text-xs font-bold hover:bg-[#004b73] transition-all disabled:opacity-50"
+            >
+              Kirim Balasan
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Children Replies (Nested Branching Tree) */}
+      {hasChildren && !isCollapsed && (
+        <div className="ml-3 sm:ml-6 pl-3 sm:pl-4 border-l-2 border-slate-200 dark:border-slate-800 space-y-2 mt-2">
+          {node.children.map((child) => (
+            <CommentNodeItem
+              key={child.id}
+              node={child}
+              depth={depth + 1}
+              activeTopicId={activeTopicId}
+              currentUserRole={currentUserRole}
+              currentUserName={currentUserName}
+              activeReplyId={activeReplyId}
+              inlineReplyText={inlineReplyText}
+              collapsedSet={collapsedSet}
+              onToggleReply={onToggleReply}
+              onCancelReply={onCancelReply}
+              onChangeInlineText={onChangeInlineText}
+              onSubmitInlineReply={onSubmitInlineReply}
+              onToggleCollapse={onToggleCollapse}
+              onTogglePin={onTogglePin}
+              onDeleteComment={onDeleteComment}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Collapsed Indicator Banner */}
+      {hasChildren && isCollapsed && (
+        <div className="ml-3 sm:ml-6 pl-3 sm:pl-4 border-l-2 border-slate-200/80 dark:border-slate-800 mt-2">
+          <button
+            type="button"
+            onClick={() => onToggleCollapse(node.id)}
+            className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-[#006194] bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full transition-all inline-flex items-center gap-1.5"
+          >
+            <span className="material-symbols-outlined text-xs">unfold_more</span>
+            <span>{node.children.length} balasan disembunyikan. Klik untuk menampilkan.</span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
   topics,
   categories,
@@ -30,9 +316,13 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
 }) => {
   const [selectedTopicId, setSelectedTopicId] = useState<string>(topics[0]?.id || '');
   const [selectedDivisionFilter, setSelectedDivisionFilter] = useState<string>('Semua Divisi');
-  const [newCommentText, setNewCommentText] = useState('');
-  const [replyParentComment, setReplyParentComment] = useState<ForumComment | null>(null);
-  
+  const [mainCommentText, setMainCommentText] = useState('');
+
+  // Inline Reply & Thread Collapse State
+  const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
+  const [inlineReplyText, setInlineReplyText] = useState('');
+  const [collapsedComments, setCollapsedComments] = useState<Set<string>>(new Set());
+
   const divisionsList =
     categories && categories.length > 0
       ? categories.map((c) => c.name)
@@ -91,9 +381,10 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const handleSendComment = (e: React.FormEvent) => {
+  // Submit Top-Level Comment (parentId: null)
+  const handleSendMainComment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCommentText.trim() || !activeTopic) return;
+    if (!mainCommentText.trim() || !activeTopic) return;
 
     const initials = currentUserName
       .split(' ')
@@ -108,16 +399,66 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
       authorRole: currentUserRole,
       avatar: undefined,
       initials: initials,
-      content: newCommentText.trim(),
+      content: mainCommentText.trim(),
       timestamp: 'Baru saja',
       isPinned: false,
-      parentId: replyParentComment ? replyParentComment.id : null
+      parentId: null
     };
 
     onAddComment(activeTopic.id, newComment);
-    setNewCommentText('');
-    setReplyParentComment(null);
+    setMainCommentText('');
+    triggerToast('Tanggapan Anda telah dipublikasikan.');
+  };
+
+  // Submit Inline Reply (parentId: specific comment ID)
+  const handleSubmitInlineReply = (parentId: string) => {
+    if (!inlineReplyText.trim() || !activeTopic) return;
+
+    const initials = currentUserName
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+
+    const newReply: ForumComment = {
+      id: `comment-${Date.now()}`,
+      author: currentUserName,
+      authorRole: currentUserRole,
+      avatar: undefined,
+      initials: initials,
+      content: inlineReplyText.trim(),
+      timestamp: 'Baru saja',
+      isPinned: false,
+      parentId: parentId
+    };
+
+    onAddComment(activeTopic.id, newReply);
+    setInlineReplyText('');
+    setActiveReplyId(null);
     triggerToast('Balasan Anda telah dipublikasikan.');
+  };
+
+  const handleToggleReply = (commentId: string, authorName: string) => {
+    if (activeReplyId === commentId) {
+      setActiveReplyId(null);
+      setInlineReplyText('');
+    } else {
+      setActiveReplyId(commentId);
+      setInlineReplyText(`@${authorName} `);
+    }
+  };
+
+  const handleToggleCollapse = (commentId: string) => {
+    setCollapsedComments((prev) => {
+      const next = new Set(prev);
+      if (next.has(commentId)) {
+        next.delete(commentId);
+      } else {
+        next.add(commentId);
+      }
+      return next;
+    });
   };
 
   const handleCreateTopicSubmit = (e: React.FormEvent) => {
@@ -150,6 +491,8 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
     setNewTopicContent('');
     triggerToast(`Topik baru "${newTopic.title}" berhasil dibuat.`);
   };
+
+  const commentTree = activeTopic ? buildCommentTree(activeTopic.comments) : [];
 
   return (
     <div className="space-y-6">
@@ -330,136 +673,67 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
                 </div>
               )}
 
-              {/* Comments Section */}
+              {/* Comments Section (Reddit-style Threaded Comments) */}
               <div className="pt-6 border-t border-slate-200 space-y-4">
-                <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#006194]">question_answer</span>
-                  <span>Diskusi Balasan ({activeTopic.comments ? activeTopic.comments.length : 0})</span>
+                <h4 className="font-bold text-slate-900 dark:text-white text-sm flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[#006194]">question_answer</span>
+                    <span>Diskusi Balasan ({activeTopic.comments ? activeTopic.comments.length : 0})</span>
+                  </span>
+                  {collapsedComments.size > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setCollapsedComments(new Set())}
+                      className="text-xs font-semibold text-[#006194] hover:underline"
+                    >
+                      Buka Semua Thread
+                    </button>
+                  )}
                 </h4>
 
                 <div className="space-y-3">
-                  {!activeTopic.comments || activeTopic.comments.length === 0 ? (
+                  {commentTree.length === 0 ? (
                     <p className="text-xs text-slate-400 py-4 italic">
                       Belum ada balasan. Jadilah yang pertama memberikan masukan!
                     </p>
                   ) : (
-                    [...activeTopic.comments]
-                      .sort((a, b) => {
-                        if (a.isPinned && !b.isPinned) return -1;
-                        if (!a.isPinned && b.isPinned) return 1;
-                        return 0;
-                      })
-                      .map((c) => {
-                        const canDelete =
-                          currentUserRole === 'Admin' ||
-                          (c.author && c.author.toLowerCase() === currentUserName.toLowerCase());
-
-                        return (
-                          <div
-                            key={c.id}
-                            className={`p-4 rounded-xl border transition-all space-y-2 ${
-                              c.isPinned
-                                ? 'bg-amber-50 border-amber-300 ring-1 ring-amber-300/50'
-                                : 'bg-slate-50 border-slate-200'
-                            }`}
-                          >
-                            {/* Pinned Badge */}
-                            {c.isPinned && (
-                              <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-amber-800 mb-1">
-                                <span className="material-symbols-outlined text-sm text-amber-600">push_pin</span>
-                                <span>Disematkan</span>
-                              </div>
-                            )}
-
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2.5">
-                                {c.avatar ? (
-                                  <img
-                                    src={c.avatar}
-                                    alt={c.author}
-                                    className="w-8 h-8 rounded-full object-cover border border-slate-200"
-                                  />
-                                ) : (
-                                  <div className="w-8 h-8 rounded-full bg-sky-100 text-[#006194] font-bold text-xs flex items-center justify-center border border-sky-200">
-                                    {c.initials || 'U'}
-                                  </div>
-                                )}
-                                <div>
-                                  <p className="font-bold text-slate-900 text-xs">{c.author}</p>
-                                  <p className="text-[10px] text-slate-500 font-medium">{c.authorRole}</p>
-                                </div>
-                              </div>
-                              <span className="text-[10px] text-slate-400 font-medium">{c.timestamp}</span>
-                            </div>
-
-                            <p className="text-xs text-slate-800 leading-relaxed pl-10 whitespace-pre-line">
-                              {c.content}
-                            </p>
-
-                            <div className="flex items-center justify-end gap-1 pt-1 text-[11px]">
-                              {/* Reply Button (Icon only) */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setNewCommentText(`@${c.author} `);
-                                  const el = document.querySelector<HTMLTextAreaElement>('textarea');
-                                  if (el) el.focus();
-                                }}
-                                className="p-1.5 text-slate-500 hover:text-[#006194] hover:bg-slate-200/70 rounded-lg transition-all flex items-center justify-center"
-                                title="Balas Diskusi"
-                              >
-                                <span className="material-symbols-outlined text-[18px]">reply</span>
-                              </button>
-
-                              {/* Pin / Unpin Button (Icon only) */}
-                              {activeTopic && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    if (onTogglePinComment) {
-                                      onTogglePinComment(activeTopic.id, c.id);
-                                    }
-                                  }}
-                                  className={`p-1.5 rounded-lg transition-all flex items-center justify-center ${
-                                    c.isPinned
-                                      ? 'text-amber-700 bg-amber-100 hover:bg-amber-200'
-                                      : 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
-                                  }`}
-                                  title={c.isPinned ? 'Lepas Sematan' : 'Sematkan Pesan'}
-                                >
-                                  <span className="material-symbols-outlined text-[18px]">push_pin</span>
-                                </button>
-                              )}
-
-                              {/* Delete Button (Icon only) */}
-                              {canDelete && onDeleteComment && activeTopic && (
-                                <button
-                                  type="button"
-                                  onClick={() => onDeleteComment(activeTopic.id, c.id)}
-                                  className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-all flex items-center justify-center"
-                                  title="Hapus Balasan"
-                                >
-                                  <span className="material-symbols-outlined text-[18px]">delete</span>
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })
+                    commentTree.map((rootNode) => (
+                      <CommentNodeItem
+                        key={rootNode.id}
+                        node={rootNode}
+                        depth={0}
+                        activeTopicId={activeTopic.id}
+                        currentUserRole={currentUserRole}
+                        currentUserName={currentUserName}
+                        activeReplyId={activeReplyId}
+                        inlineReplyText={inlineReplyText}
+                        collapsedSet={collapsedComments}
+                        onToggleReply={handleToggleReply}
+                        onCancelReply={() => {
+                          setActiveReplyId(null);
+                          setInlineReplyText('');
+                        }}
+                        onChangeInlineText={setInlineReplyText}
+                        onSubmitInlineReply={handleSubmitInlineReply}
+                        onToggleCollapse={handleToggleCollapse}
+                        onTogglePin={onTogglePinComment}
+                        onDeleteComment={onDeleteComment}
+                      />
+                    ))
                   )}
                 </div>
               </div>
 
-              {/* Reply Comment Editor */}
-              <form onSubmit={handleSendComment} className="pt-4 border-t border-slate-200 space-y-3">
-                <label className="text-xs font-bold text-slate-700 block">Tulis Balasan Diskusi</label>
-                <div className="border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#006194]/20 focus-within:border-[#006194]">
+              {/* Main Top-Level Comment Form */}
+              <form onSubmit={handleSendMainComment} className="pt-4 border-t border-slate-200 space-y-3">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-200 block">Tulis Balasan Utama</label>
+                <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#006194]/20 focus-within:border-[#006194]">
                   <textarea
-                    value={newCommentText}
-                    onChange={(e) => setNewCommentText(e.target.value)}
-                    placeholder="Ketik tanggapan Anda di sini..."
+                    value={mainCommentText}
+                    onChange={(e) => setMainCommentText(e.target.value)}
+                    placeholder="Ketik tanggapan Anda untuk topik ini..."
                     rows={3}
-                    className="w-full p-3 text-xs text-slate-800 outline-none resize-none"
+                    className="w-full p-3 text-xs text-slate-800 dark:text-white bg-transparent outline-none resize-none"
                     required
                   />
                 </div>
@@ -470,7 +744,7 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
                     className="px-5 py-2.5 bg-[#006194] text-white rounded-xl text-xs font-bold hover:bg-[#004b73] transition-all flex items-center gap-2"
                   >
                     <span className="material-symbols-outlined text-base">send</span>
-                    <span>Kirim Balasan</span>
+                    <span>Kirim Tanggapan Utama</span>
                   </button>
                 </div>
               </form>
