@@ -427,6 +427,23 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
 
   const activeTopic = topics.find((t) => t.id === selectedTopicId) || filteredTopics[0] || topics[0];
 
+  const [replyNotificationPopup, setReplyNotificationPopup] = useState<{
+    targetAuthor: string;
+    senderName: string;
+    message: string;
+  } | null>(null);
+
+  const triggerReplyPopup = (targetAuthor: string, senderName: string, fullMessage: string) => {
+    setReplyNotificationPopup({
+      targetAuthor,
+      senderName,
+      message: fullMessage
+    });
+    setTimeout(() => {
+      setReplyNotificationPopup(null);
+    }, 8000);
+  };
+
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
@@ -444,26 +461,44 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
       .substring(0, 2)
       .toUpperCase();
 
+    const trimmedText = mainCommentText.trim();
+
     const newComment: ForumComment = {
       id: `comment-${Date.now()}`,
       author: currentUserName,
       authorRole: currentUserRole,
       avatar: undefined,
       initials: initials,
-      content: mainCommentText.trim(),
+      content: trimmedText,
       timestamp: 'Baru saja',
       isPinned: false,
       parentId: null
     };
 
     onAddComment(activeTopic.id, newComment);
+
+    // Check if main comment tagged someone with @Author
+    const mentionMatch = trimmedText.match(/^@([^\s:]+)/);
+    if (mentionMatch) {
+      const taggedName = mentionMatch[1];
+      const parentCandidate = activeTopic.comments.find(
+        (p) => p.author.toLowerCase().replace(/\s+/g, '') === taggedName.toLowerCase().replace(/\s+/g, '')
+      );
+      const targetAuthor = parentCandidate ? parentCandidate.author : taggedName;
+      triggerReplyPopup(targetAuthor, currentUserName, trimmedText);
+    } else {
+      triggerToast('Tanggapan Anda telah dipublikasikan.');
+    }
+
     setMainCommentText('');
-    triggerToast('Tanggapan Anda telah dipublikasikan.');
   };
 
   // Submit Inline Reply (parentId: specific comment ID)
   const handleSubmitInlineReply = (parentId: string) => {
     if (!inlineReplyText.trim() || !activeTopic) return;
+
+    const parentComment = activeTopic.comments.find((c) => c.id === parentId);
+    const targetAuthor = parentComment ? parentComment.author : 'Pengguna';
 
     const initials = currentUserName
       .split(' ')
@@ -472,22 +507,30 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
       .substring(0, 2)
       .toUpperCase();
 
+    let formattedText = inlineReplyText.trim();
+    if (!formattedText.startsWith('@')) {
+      formattedText = `@${targetAuthor} ${formattedText}`;
+    }
+
     const newReply: ForumComment = {
       id: `comment-${Date.now()}`,
       author: currentUserName,
       authorRole: currentUserRole,
       avatar: undefined,
       initials: initials,
-      content: inlineReplyText.trim(),
+      content: formattedText,
       timestamp: 'Baru saja',
       isPinned: false,
       parentId: parentId
     };
 
     onAddComment(activeTopic.id, newReply);
+
+    // Trigger instant Popup Notification alert
+    triggerReplyPopup(targetAuthor, currentUserName, formattedText);
+
     setInlineReplyText('');
     setActiveReplyId(null);
-    triggerToast('Balasan Anda telah dipublikasikan.');
   };
 
   const handleToggleReply = (commentId: string, authorName: string) => {
@@ -916,6 +959,43 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
                 <span className="material-symbols-outlined text-base">delete</span>
                 <span>Ya, Hapus Topik</span>
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Instant Reply Notification Popup Alert */}
+      {replyNotificationPopup && (
+        <div className="fixed top-6 right-6 z-50 max-w-md w-full bg-white dark:bg-slate-900 border-2 border-[#006194] dark:border-sky-500 rounded-2xl shadow-2xl p-4 space-y-3 animate-in slide-in-from-top-5 duration-200">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+            <div className="flex items-center gap-2 text-[#006194] dark:text-sky-400 font-extrabold text-xs">
+              <span className="material-symbols-outlined text-lg">question_answer</span>
+              <span>Pemberitahuan Balasan Komentar</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setReplyNotificationPopup(null)}
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-lg transition-colors"
+            >
+              <span className="material-symbols-outlined text-sm">close</span>
+            </button>
+          </div>
+
+          <div className="space-y-1.5">
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <strong className="text-slate-900 dark:text-white">{replyNotificationPopup.senderName}</strong> membalas komentar <strong className="text-[#006194] dark:text-sky-400">{replyNotificationPopup.targetAuthor}</strong>:
+            </p>
+            <div className="p-3 bg-sky-50/90 dark:bg-slate-800/90 border border-sky-200/80 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed shadow-sm">
+              {replyNotificationPopup.message.startsWith('@') ? (
+                replyNotificationPopup.message
+              ) : (
+                <>
+                  <span className="font-bold text-[#006194] dark:text-sky-300">
+                    @{replyNotificationPopup.targetAuthor}
+                  </span>{' '}
+                  {replyNotificationPopup.message}
+                </>
+              )}
             </div>
           </div>
         </div>
