@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavigationTab, User, UserRole, AppNotification } from '../types';
+import { getRelativeTime } from '../utils/dateUtils';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -39,10 +40,20 @@ export const Header: React.FC<HeaderProps> = ({
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showThemeMenu, setShowThemeMenu] = useState(false);
+  const [, setTick] = useState(0);
 
   const notifRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const themeRef = useRef<HTMLDivElement>(null);
+
+  // Auto-refresh relative timestamps every 30 seconds while notification panel is open
+  useEffect(() => {
+    if (!showNotifications) return;
+    const interval = setInterval(() => {
+      setTick((prev) => prev + 1);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [showNotifications]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -194,7 +205,9 @@ export const Header: React.FC<HeaderProps> = ({
                             {n.title || `Notifikasi Sistem`}
                           </span>
                         </div>
-                        <span className="text-slate-400 dark:text-slate-500 text-[10px] shrink-0 font-medium">{n.time}</span>
+                        <span className="text-slate-400 dark:text-slate-500 text-[10px] shrink-0 font-medium">
+                          {getRelativeTime(n.createdAt, n.time)}
+                        </span>
                       </div>
 
                       <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-medium whitespace-pre-line break-words pl-5">
