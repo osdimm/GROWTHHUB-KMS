@@ -30,14 +30,24 @@ export const LaporanPenggunaanView: React.FC<LaporanPenggunaanViewProps> = ({
   const totalViews = articles.reduce((acc, a) => acc + (a.views || 0), 0) + handoverDocs.reduce((acc, h) => acc + (h.views || 0), 0);
   const totalDownloads = articles.reduce((acc, a) => acc + (a.downloads || 0), 0) + handoverDocs.reduce((acc, h) => acc + (h.downloads || 0), 0);
 
-  // Dynamic Popular Docs from actual articles sorted by total views and downloads
-  const popularDocs = [...articles]
-    .sort((a, b) => ((b.views || 0) + (b.downloads || 0)) - ((a.views || 0) + (a.downloads || 0)))
+  // Combine all uploaded documents (Articles + Handover Docs) for accurate download ranking
+  const allDocs = [
+    ...articles.map((a) => ({ ...a, docCategory: a.category })),
+    ...handoverDocs.map((h) => ({ ...h, docCategory: h.division }))
+  ];
+
+  // Dynamic Popular Docs sorted strictly by: 1. Downloads (descending), 2. Views (descending)
+  const popularDocs = [...allDocs]
+    .sort((a, b) => {
+      const diffDownloads = (b.downloads || 0) - (a.downloads || 0);
+      if (diffDownloads !== 0) return diffDownloads;
+      return (b.views || 0) - (a.views || 0);
+    })
     .slice(0, 5)
     .map((doc, idx) => ({
       rank: idx + 1,
       title: doc.title,
-      category: doc.category,
+      category: doc.docCategory || 'Umum',
       views: doc.views || 0,
       downloads: doc.downloads || 0
     }));
@@ -49,7 +59,7 @@ export const LaporanPenggunaanView: React.FC<LaporanPenggunaanViewProps> = ({
     'bg-fuchsia-600', 'bg-lime-600', 'bg-orange-600', 'bg-teal-700'
   ];
 
-  // Dynamic Division Stats based on categories & articles & handovers
+  // Dynamic Division Stats ranked strictly by: 1. Document Count, 2. Downloads, 3. Views
   const divisionStats = categories.map((cat, idx) => {
     const catArticles = articles.filter(
       (a) => a.category.toLowerCase() === cat.name.toLowerCase()
@@ -57,19 +67,12 @@ export const LaporanPenggunaanView: React.FC<LaporanPenggunaanViewProps> = ({
     const catHandovers = handoverDocs.filter(
       (h) => h.division.toLowerCase() === cat.name.toLowerCase()
     );
-    const catViews = catArticles.reduce((acc, a) => acc + (a.views || 0), 0) + catHandovers.reduce((acc, h) => acc + (h.views || 0), 0);
     const docCount = catArticles.length + catHandovers.length;
-    
-    // Accurate percentage calculation:
-    // If totalViews > 0: percentage of total views for this division
-    // Else if totalUploadedDocs > 0: percentage of total documents for this division
-    // Else: 0%
-    let progress = 0;
-    if (totalViews > 0) {
-      progress = Math.round((catViews / totalViews) * 100);
-    } else if (totalUploadedDocs > 0 && docCount > 0) {
-      progress = Math.round((docCount / totalUploadedDocs) * 100);
-    }
+    const catViews = catArticles.reduce((acc, a) => acc + (a.views || 0), 0) + catHandovers.reduce((acc, h) => acc + (h.views || 0), 0);
+    const catDownloads = catArticles.reduce((acc, a) => acc + (a.downloads || 0), 0) + catHandovers.reduce((acc, h) => acc + (h.downloads || 0), 0);
+
+    // Percentage of total documents uploaded by division
+    const progress = totalUploadedDocs > 0 ? Math.round((docCount / totalUploadedDocs) * 100) : 0;
 
     return {
       name: cat.name,
@@ -77,9 +80,10 @@ export const LaporanPenggunaanView: React.FC<LaporanPenggunaanViewProps> = ({
       count: `${docCount} Dokumen (${catViews.toLocaleString('id-ID')} Views)`,
       color: palette[idx % palette.length],
       catViews,
+      catDownloads,
       docCount
     };
-  }).sort((a, b) => b.catViews - a.catViews || b.docCount - a.docCount);
+  }).sort((a, b) => b.docCount - a.docCount || b.catDownloads - a.catDownloads || b.catViews - a.catViews);
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
