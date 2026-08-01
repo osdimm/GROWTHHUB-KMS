@@ -690,58 +690,28 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                     onClick={() => setSelectedTopicId(topic.id)}
                     className={`p-4 rounded-xl border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-sky-50 dark:bg-slate-800 border-2 border-[#006194] dark:border-cyan-400 shadow-sm'
+                        ? 'bg-sky-50/80 dark:bg-slate-800 border-[#006194] dark:border-cyan-400 shadow-sm'
                         : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span
-                        className={`text-[10px] font-extrabold px-2 py-0.5 rounded ${
-                          isSelected
-                            ? 'bg-sky-100 text-[#006194] dark:bg-cyan-950 dark:text-cyan-300 dark:border dark:border-cyan-800'
-                            : 'bg-sky-100 text-[#006194] dark:bg-slate-800 dark:text-cyan-400 dark:border dark:border-slate-700'
-                        }`}
-                      >
+                      <span className="text-[10px] font-bold text-[#006194] dark:text-cyan-300 bg-sky-100 dark:bg-cyan-950 px-2 py-0.5 rounded">
                         {topic.category}
                       </span>
-                      <span
-                        className={`text-[10px] font-medium ${
-                          isSelected
-                            ? 'text-slate-700 dark:text-slate-300'
-                            : 'text-slate-500 dark:text-slate-400'
-                        }`}
-                      >
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
                         {topic.date}
                       </span>
                     </div>
 
-                    <h4
-                      className={`font-bold text-sm line-clamp-2 leading-snug ${
-                        isSelected
-                          ? 'text-slate-900 dark:text-white'
-                          : 'text-slate-900 dark:text-slate-100'
-                      }`}
-                    >
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm line-clamp-2 leading-snug">
                       {topic.title}
                     </h4>
 
                     <div className="mt-3 flex items-center justify-between text-xs">
-                      <span
-                        className={`font-semibold truncate max-w-[140px] ${
-                          isSelected
-                            ? 'text-slate-700 dark:text-slate-300'
-                            : 'text-slate-600 dark:text-slate-400'
-                        }`}
-                      >
+                      <span className="font-semibold text-slate-700 dark:text-slate-400 truncate max-w-[140px]">
                         {topic.author}
                       </span>
-                      <span
-                        className={`flex items-center gap-1 font-bold ${
-                          isSelected
-                            ? 'text-[#006194] dark:text-cyan-400'
-                            : 'text-[#006194] dark:text-cyan-400'
-                        }`}
-                      >
+                      <span className="flex items-center gap-1 font-bold text-[#006194] dark:text-cyan-400">
                         <span className="material-symbols-outlined text-[16px]">chat_bubble</span>
                         <span>{topic.comments ? topic.comments.length : 0} Balasan</span>
                       </span>
