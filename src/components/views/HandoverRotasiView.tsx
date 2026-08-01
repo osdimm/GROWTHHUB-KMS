@@ -24,7 +24,7 @@ export const HandoverRotasiView: React.FC<HandoverRotasiViewProps> = ({
   currentUserName = 'Dandi Pangestu',
   currentUserDivision
 }) => {
-  const [selectedPeriod, setSelectedPeriod] = useState<string>('Q4 2025');
+  const [selectedPeriod, setSelectedPeriod] = useState<string>('Semua Periode');
   const [selectedDivision, setSelectedDivision] = useState<string>('Semua');
   const [searchQuery, setSearchQuery] = useState('');
 
