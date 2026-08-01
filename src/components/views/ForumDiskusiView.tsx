@@ -32,9 +32,30 @@ const buildCommentTree = (comments: ForumComment[]): CommentTreeNode[] => {
 
   comments.forEach((c) => {
     const node = map.get(c.id)!;
+    let parentFound = false;
+
+    // 1. Check parentId matching first
     if (c.parentId && map.has(c.parentId)) {
       map.get(c.parentId)!.children.push(node);
+      parentFound = true;
     } else {
+      // 2. Fallback: Check if comment starts with @Author
+      const mentionMatch = c.content.match(/^@([^\s:]+)/);
+      if (mentionMatch) {
+        const mentionedAuthor = mentionMatch[1].toLowerCase();
+        const parentCandidate = comments.find(
+          (p) =>
+            p.id !== c.id &&
+            p.author.toLowerCase().replace(/\s+/g, '') === mentionedAuthor.replace(/\s+/g, '')
+        );
+        if (parentCandidate && map.has(parentCandidate.id)) {
+          map.get(parentCandidate.id)!.children.push(node);
+          parentFound = true;
+        }
+      }
+    }
+
+    if (!parentFound) {
       roots.push(node);
     }
   });

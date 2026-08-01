@@ -282,7 +282,7 @@ export const saveForumTopicToSupabase = async (topic: ForumTopic) => {
 };
 
 export const saveForumCommentToSupabase = async (topicId: string, comment: ForumComment) => {
-  const { error } = await supabase.from('forum_comments').upsert({
+  const payload: any = {
     id: comment.id,
     topic_id: topicId,
     author: comment.author,
@@ -293,9 +293,27 @@ export const saveForumCommentToSupabase = async (topicId: string, comment: Forum
     timestamp: comment.timestamp,
     is_pinned: comment.isPinned || false,
     parent_id: comment.parentId || null
-  });
+  };
 
-  if (error) console.error('Error saving forum comment to Supabase:', error.message);
+  let { error } = await supabase.from('forum_comments').upsert(payload);
+
+  if (error) {
+    console.warn('Upsert with parent_id/is_pinned failed, retrying basic fields:', error.message);
+    const fallbackPayload = {
+      id: comment.id,
+      topic_id: topicId,
+      author: comment.author,
+      author_role: comment.authorRole,
+      avatar: comment.avatar,
+      initials: comment.initials,
+      content: comment.content,
+      timestamp: comment.timestamp
+    };
+    const retry = await supabase.from('forum_comments').upsert(fallbackPayload);
+    if (retry.error) {
+      console.error('Error saving forum comment to Supabase:', retry.error.message);
+    }
+  }
 };
 
 export const deleteForumTopicFromSupabase = async (id: string) => {

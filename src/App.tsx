@@ -285,7 +285,22 @@ export default function App() {
       try {
         const latestTopics = await getForumTopicsFromSupabase();
         if (latestTopics && latestTopics.length > 0) {
-          setForumTopics(latestTopics);
+          setForumTopics((prevTopics) => {
+            return latestTopics.map((latest) => {
+              const prevMatch = prevTopics.find((p) => p.id === latest.id);
+              if (!prevMatch) return latest;
+
+              const dbCommentIds = new Set(latest.comments.map((c) => c.id));
+              const localOnlyComments = prevMatch.comments.filter((c) => !dbCommentIds.has(c.id));
+              const mergedComments = [...latest.comments, ...localOnlyComments];
+
+              return {
+                ...latest,
+                comments: mergedComments,
+                commentCount: mergedComments.length
+              };
+            });
+          });
         }
       } catch (e) {
         console.warn('Realtime fetch warning:', e);
