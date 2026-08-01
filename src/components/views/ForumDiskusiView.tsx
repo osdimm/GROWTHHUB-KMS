@@ -343,103 +343,109 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
                       Belum ada balasan. Jadilah yang pertama memberikan masukan!
                     </p>
                   ) : (
-                    activeTopic.comments.map((c) => {
-                      const canDelete =
-                        currentUserRole === 'Admin' ||
-                        (c.author && c.author.toLowerCase() === currentUserName.toLowerCase());
+                    [...activeTopic.comments]
+                      .sort((a, b) => {
+                        if (a.isPinned && !b.isPinned) return -1;
+                        if (!a.isPinned && b.isPinned) return 1;
+                        return 0;
+                      })
+                      .map((c) => {
+                        const canDelete =
+                          currentUserRole === 'Admin' ||
+                          (c.author && c.author.toLowerCase() === currentUserName.toLowerCase());
 
-                      const canPin =
-                        currentUserRole === 'Admin' ||
-                        currentUserRole === 'Manajer' ||
-                        (activeTopic && activeTopic.author.toLowerCase() === currentUserName.toLowerCase());
-
-                      return (
-                        <div
-                          key={c.id}
-                          className={`p-4 rounded-xl border transition-all space-y-2 ${
-                            c.isPinned
-                              ? 'bg-amber-50 border-amber-300 ring-1 ring-amber-300/50'
-                              : 'bg-slate-50 border-slate-200'
-                          }`}
-                        >
-                          {/* Pinned Badge */}
-                          {c.isPinned && (
-                            <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-amber-800 mb-1">
-                              <span className="material-symbols-outlined text-sm text-amber-600">push_pin</span>
-                              <span>Disematkan</span>
-                            </div>
-                          )}
-
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2.5">
-                              {c.avatar ? (
-                                <img
-                                  src={c.avatar}
-                                  alt={c.author}
-                                  className="w-8 h-8 rounded-full object-cover border border-slate-200"
-                                />
-                              ) : (
-                                <div className="w-8 h-8 rounded-full bg-sky-100 text-[#006194] font-bold text-xs flex items-center justify-center border border-sky-200">
-                                  {c.initials || 'U'}
-                                </div>
-                              )}
-                              <div>
-                                <p className="font-bold text-slate-900 text-xs">{c.author}</p>
-                                <p className="text-[10px] text-slate-500 font-medium">{c.authorRole}</p>
+                        return (
+                          <div
+                            key={c.id}
+                            className={`p-4 rounded-xl border transition-all space-y-2 ${
+                              c.isPinned
+                                ? 'bg-amber-50 border-amber-300 ring-1 ring-amber-300/50'
+                                : 'bg-slate-50 border-slate-200'
+                            }`}
+                          >
+                            {/* Pinned Badge */}
+                            {c.isPinned && (
+                              <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-amber-800 mb-1">
+                                <span className="material-symbols-outlined text-sm text-amber-600">push_pin</span>
+                                <span>Disematkan</span>
                               </div>
+                            )}
+
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2.5">
+                                {c.avatar ? (
+                                  <img
+                                    src={c.avatar}
+                                    alt={c.author}
+                                    className="w-8 h-8 rounded-full object-cover border border-slate-200"
+                                  />
+                                ) : (
+                                  <div className="w-8 h-8 rounded-full bg-sky-100 text-[#006194] font-bold text-xs flex items-center justify-center border border-sky-200">
+                                    {c.initials || 'U'}
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="font-bold text-slate-900 text-xs">{c.author}</p>
+                                  <p className="text-[10px] text-slate-500 font-medium">{c.authorRole}</p>
+                                </div>
+                              </div>
+                              <span className="text-[10px] text-slate-400 font-medium">{c.timestamp}</span>
                             </div>
-                            <span className="text-[10px] text-slate-400 font-medium">{c.timestamp}</span>
-                          </div>
 
-                          <p className="text-xs text-slate-800 leading-relaxed pl-10 whitespace-pre-line">
-                            {c.content}
-                          </p>
+                            <p className="text-xs text-slate-800 leading-relaxed pl-10 whitespace-pre-line">
+                              {c.content}
+                            </p>
 
-                          <div className="flex items-center justify-end gap-2 pt-1 text-[11px] font-semibold">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setNewCommentText(`@${c.author} `);
-                                const el = document.querySelector<HTMLTextAreaElement>('textarea');
-                                if (el) el.focus();
-                              }}
-                              className="px-2.5 py-1 text-slate-600 hover:text-[#006194] hover:bg-slate-200/70 rounded-lg transition-all flex items-center gap-1"
-                            >
-                              <span className="material-symbols-outlined text-[15px]">reply</span>
-                              <span>Balas</span>
-                            </button>
-
-                            {canPin && onTogglePinComment && activeTopic && (
+                            <div className="flex items-center justify-end gap-2 pt-1 text-[11px] font-semibold">
                               <button
                                 type="button"
-                                onClick={() => onTogglePinComment(activeTopic.id, c.id)}
-                                className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
-                                  c.isPinned
-                                    ? 'text-amber-800 bg-amber-100 hover:bg-amber-200'
-                                    : 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
-                                }`}
-                                title={c.isPinned ? 'Lepas Sematan' : 'Sematkan Pesan'}
+                                onClick={() => {
+                                  setNewCommentText(`@${c.author} `);
+                                  const el = document.querySelector<HTMLTextAreaElement>('textarea');
+                                  if (el) el.focus();
+                                }}
+                                className="px-2.5 py-1 text-slate-600 hover:text-[#006194] hover:bg-slate-200/70 rounded-lg transition-all flex items-center gap-1"
                               >
-                                <span className="material-symbols-outlined text-[15px]">push_pin</span>
-                                <span>{c.isPinned ? 'Lepas Sematan' : 'Sematkan'}</span>
+                                <span className="material-symbols-outlined text-[15px]">reply</span>
+                                <span>Balas</span>
                               </button>
-                            )}
 
-                            {canDelete && onDeleteComment && activeTopic && (
-                              <button
-                                type="button"
-                                onClick={() => onDeleteComment(activeTopic.id, c.id)}
-                                className="px-2.5 py-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-all flex items-center gap-1"
-                                title="Hapus balasan"
-                              >
-                                <span className="material-symbols-outlined text-[15px]">delete</span>
-                                <span>Hapus</span>
-                              </button>
-                            )}
+                              {/* Pin / Unpin Button - ALWAYS VISIBLE NEXT TO BALAS */}
+                              {activeTopic && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (onTogglePinComment) {
+                                      onTogglePinComment(activeTopic.id, c.id);
+                                    }
+                                  }}
+                                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                                    c.isPinned
+                                      ? 'text-amber-800 bg-amber-100 hover:bg-amber-200 font-bold'
+                                      : 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
+                                  }`}
+                                  title={c.isPinned ? 'Lepas Sematan' : 'Sematkan Pesan'}
+                                >
+                                  <span className="material-symbols-outlined text-[15px]">push_pin</span>
+                                  <span>{c.isPinned ? 'Lepas Sematan' : 'Sematkan'}</span>
+                                </button>
+                              )}
+
+                              {canDelete && onDeleteComment && activeTopic && (
+                                <button
+                                  type="button"
+                                  onClick={() => onDeleteComment(activeTopic.id, c.id)}
+                                  className="px-2.5 py-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-all flex items-center gap-1"
+                                  title="Hapus balasan"
+                                >
+                                  <span className="material-symbols-outlined text-[15px]">delete</span>
+                                  <span>Hapus</span>
+                                </button>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })
+                        );
+                      })
                   )}
                 </div>
               </div>

@@ -726,42 +726,19 @@ export default function App() {
     );
   };
 
-  const handleLikeComment = (topicId: string, commentId: string) => {
-    const userIdentifier = currentUser.id || currentUser.email || currentUser.name;
+  const handleTogglePinComment = (topicId: string, commentId: string) => {
     setForumTopics((prev) =>
       prev.map((t) => {
         if (t.id === topicId) {
           const updatedComments = t.comments.map((c) => {
             if (c.id === commentId) {
-              const currentLikedBy = c.likedBy || [];
-              const hasUserLiked = currentLikedBy.includes(userIdentifier);
-              let newLikedBy: string[];
-              let newLikesCount: number;
-
-              if (hasUserLiked) {
-                // User already liked this -> UNLIKE (-1)
-                newLikedBy = currentLikedBy.filter((id) => id !== userIdentifier);
-                newLikesCount = Math.max(0, (c.likes || 0) - 1);
-              } else {
-                // User hasn't liked this yet -> LIKE (+1)
-                newLikedBy = [...currentLikedBy, userIdentifier];
-                newLikesCount = (c.likes || 0) + 1;
-              }
-
-              const updatedComment: ForumComment = {
-                ...c,
-                likes: newLikesCount,
-                likedBy: newLikedBy
-              };
+              const updatedComment = { ...c, isPinned: !c.isPinned };
               saveForumCommentToSupabase(topicId, updatedComment).catch(console.error);
               return updatedComment;
             }
             return c;
           });
-          return {
-            ...t,
-            comments: updatedComments
-          };
+          return { ...t, comments: updatedComments };
         }
         return t;
       })
@@ -979,7 +956,7 @@ export default function App() {
                 categories={categories}
                 onAddTopic={handleAddTopic}
                 onAddComment={handleAddComment}
-                onLikeComment={handleLikeComment}
+                onTogglePinComment={handleTogglePinComment}
                 onDeleteComment={handleDeleteComment}
                 onDeleteTopic={handleDeleteTopic}
                 globalSearch={globalSearch}
