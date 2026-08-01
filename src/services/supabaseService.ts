@@ -255,8 +255,8 @@ export const getForumTopicsFromSupabase = async (): Promise<ForumTopic[] | null>
       initials: c.initials || '',
       content: c.content,
       timestamp: c.timestamp || '',
-      likes: c.likes || 0,
-      likedBy: c.liked_by || []
+      isPinned: c.is_pinned || false,
+      parentId: c.parent_id || null
     }))
   }));
 };
@@ -291,8 +291,8 @@ export const saveForumCommentToSupabase = async (topicId: string, comment: Forum
     initials: comment.initials,
     content: comment.content,
     timestamp: comment.timestamp,
-    likes: comment.likes,
-    liked_by: comment.likedBy || []
+    is_pinned: comment.isPinned || false,
+    parent_id: comment.parentId || null
   });
 
   if (error) console.error('Error saving forum comment to Supabase:', error.message);

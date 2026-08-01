@@ -83,6 +83,9 @@ export interface ForumComment {
   initials?: string;
   content: string;
   timestamp: string;
+  isPinned?: boolean;
+  parentId?: string | null;
+  replies?: ForumComment[];
   likes?: number;
   likedBy?: string[];
 }

@@ -6,7 +6,7 @@ interface ForumDiskusiViewProps {
   categories?: CategoryItem[];
   onAddTopic: (topic: ForumTopic) => void;
   onAddComment: (topicId: string, comment: ForumComment) => void;
-  onLikeComment?: (topicId: string, commentId: string) => void;
+  onTogglePinComment?: (topicId: string, commentId: string) => void;
   onDeleteComment?: (topicId: string, commentId: string) => void;
   onDeleteTopic?: (topicId: string) => void;
   globalSearch: string;
@@ -20,7 +20,7 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
   categories,
   onAddTopic,
   onAddComment,
-  onLikeComment,
+  onTogglePinComment,
   onDeleteComment,
   onDeleteTopic,
   globalSearch,
@@ -29,14 +29,10 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
   currentUserId = 'u-karyawan'
 }) => {
   const [selectedTopicId, setSelectedTopicId] = useState<string>(topics[0]?.id || '');
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedDivisionFilter, setSelectedDivisionFilter] = useState<string>('Semua Divisi');
   const [newCommentText, setNewCommentText] = useState('');
-
-  // Comment & Topic Like Interactive State
-  const [likedCommentMap, setLikedCommentMap] = useState<Record<string, number>>({});
-  const [userLikedComments, setUserLikedComments] = useState<Set<string>>(new Set());
-
+  const [replyParentComment, setReplyParentComment] = useState<ForumComment | null>(null);
+  
   const divisionsList =
     categories && categories.length > 0
       ? categories.map((c) => c.name)
@@ -59,14 +55,11 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
           'Community & Digital Marketing'
         ];
 
-  // New Thread Modal
   const [showNewTopicModal, setShowNewTopicModal] = useState(false);
   const [newTopicTitle, setNewTopicTitle] = useState('');
   const [newTopicCategory, setNewTopicCategory] = useState(divisionsList[0] || 'Talent Development');
   const [newTopicContent, setNewTopicContent] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // Delete Topic Confirmation Modal (Admin)
   const [deleteConfirmTopic, setDeleteConfirmTopic] = useState<ForumTopic | null>(null);
 
   const handleConfirmDeleteTopic = () => {
@@ -78,48 +71,52 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
   };
 
   const query = globalSearch.toLowerCase();
-
   const filteredTopics = topics.filter((t) => {
     const matchesSearch =
       t.title.toLowerCase().includes(query) ||
       t.author.toLowerCase().includes(query) ||
       t.category.toLowerCase().includes(query) ||
-      t.tags.some((tg) => tg.toLowerCase().includes(query));
+      (t.tags && t.tags.some((tag) => tag.toLowerCase().includes(query)));
 
     const matchesDivision =
-      selectedDivisionFilter === 'Semua Divisi' ||
-      t.category.toLowerCase() === selectedDivisionFilter.toLowerCase();
+      selectedDivisionFilter === 'Semua Divisi' || t.category === selectedDivisionFilter;
 
     return matchesSearch && matchesDivision;
   });
 
-  const activeTopic =
-    filteredTopics.find((t) => t.id === selectedTopicId) || filteredTopics[0] || topics[0];
+  const activeTopic = topics.find((t) => t.id === selectedTopicId) || filteredTopics[0] || topics[0];
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 4000);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
   const handleSendComment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCommentText.trim() || !activeTopic) return;
 
+    const initials = currentUserName
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+
     const newComment: ForumComment = {
-      id: `fc-${Date.now()}`,
+      id: `comment-${Date.now()}`,
       author: currentUserName,
       authorRole: currentUserRole,
-      content: newCommentText,
-      timestamp: `${new Date().toLocaleDateString('id-ID', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      })}, ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`,
-      likes: 0
+      avatar: undefined,
+      initials: initials,
+      content: newCommentText.trim(),
+      timestamp: 'Baru saja',
+      isPinned: false,
+      parentId: replyParentComment ? replyParentComment.id : null
     };
 
     onAddComment(activeTopic.id, newComment);
     setNewCommentText('');
+    setReplyParentComment(null);
     triggerToast('Balasan Anda telah dipublikasikan.');
   };
 
@@ -152,6 +149,128 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
     setNewTopicTitle('');
     setNewTopicContent('');
     triggerToast(`Topik baru "${newTopic.title}" berhasil dibuat.`);
+  };
+
+  // Render a comment and its nested child replies (Reddit-style Branching Tree)
+  const renderCommentItem = (comment: ForumComment, depth = 0): React.ReactNode => {
+    // Find direct child replies by parentId OR by @author prefix matching
+    const childReplies = activeTopic
+      ? activeTopic.comments.filter(
+          (c) => c.parentId === comment.id || (!c.parentId && c.content.startsWith(`@${comment.author}`))
+        )
+      : [];
+
+    const canDelete =
+      currentUserRole === 'Admin' ||
+      (comment.author && comment.author.toLowerCase() === currentUserName.toLowerCase());
+
+    const canPin =
+      currentUserRole === 'Admin' ||
+      currentUserRole === 'Manajer' ||
+      (activeTopic && activeTopic.author.toLowerCase() === currentUserName.toLowerCase());
+
+    return (
+      <div key={comment.id} className="space-y-2">
+        {/* Comment Card */}
+        <div
+          className={`p-4 rounded-xl border transition-all space-y-2 ${
+            comment.isPinned
+              ? 'bg-amber-50 border-amber-300 ring-1 ring-amber-300/50'
+              : 'bg-slate-50 border-slate-200'
+          }`}
+        >
+          {/* Pinned Badge */}
+          {comment.isPinned && (
+            <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-amber-800 mb-1">
+              <span className="material-symbols-outlined text-sm text-amber-600">push_pin</span>
+              <span>Disematkan</span>
+            </div>
+          )}
+
+          {/* Comment Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              {comment.avatar ? (
+                <img
+                  src={comment.avatar}
+                  alt={comment.author}
+                  className="w-8 h-8 rounded-full object-cover border border-slate-200"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-sky-100 text-[#006194] font-bold text-xs flex items-center justify-center border border-sky-200">
+                  {comment.initials || 'U'}
+                </div>
+              )}
+              <div>
+                <p className="font-bold text-slate-900 text-xs">{comment.author}</p>
+                <p className="text-[10px] text-slate-500 font-medium">{comment.authorRole}</p>
+              </div>
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium">{comment.timestamp}</span>
+          </div>
+
+          {/* Comment Content */}
+          <p className="text-xs text-slate-800 leading-relaxed pl-10 whitespace-pre-line">
+            {comment.content}
+          </p>
+
+          {/* Action Controls */}
+          <div className="flex items-center justify-end gap-2 pt-1 text-[11px] font-semibold">
+            {/* Reply Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setReplyParentComment(comment);
+                setNewCommentText(`@${comment.author} `);
+                const el = document.querySelector<HTMLTextAreaElement>('textarea');
+                if (el) el.focus();
+              }}
+              className="px-2.5 py-1 text-slate-600 hover:text-[#006194] hover:bg-slate-200/70 rounded-lg transition-all flex items-center gap-1"
+            >
+              <span className="material-symbols-outlined text-[15px]">reply</span>
+              <span>Balas</span>
+            </button>
+
+            {/* Pin / Unpin Button */}
+            {canPin && onTogglePinComment && activeTopic && (
+              <button
+                type="button"
+                onClick={() => onTogglePinComment(activeTopic.id, comment.id)}
+                className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                  comment.isPinned
+                    ? 'text-amber-800 bg-amber-100 hover:bg-amber-200'
+                    : 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
+                }`}
+                title={comment.isPinned ? 'Lepas Sematan' : 'Sematkan Pesan'}
+              >
+                <span className="material-symbols-outlined text-[15px]">push_pin</span>
+                <span>{comment.isPinned ? 'Lepas Sematan' : 'Sematkan'}</span>
+              </button>
+            )}
+
+            {/* Delete Button */}
+            {canDelete && onDeleteComment && activeTopic && (
+              <button
+                type="button"
+                onClick={() => onDeleteComment(activeTopic.id, comment.id)}
+                className="px-2.5 py-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-all flex items-center gap-1"
+                title="Hapus balasan"
+              >
+                <span className="material-symbols-outlined text-[15px]">delete</span>
+                <span>Hapus</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Reddit-style Nested Child Branch Container */}
+        {childReplies.length > 0 && (
+          <div className="border-l-2 border-[#006194]/40 pl-3 sm:pl-5 space-y-3 mt-2 ml-4 sm:ml-6">
+            {childReplies.map((reply) => renderCommentItem(reply, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -328,118 +447,76 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
                 </h4>
 
                 <div className="space-y-3">
-                  {activeTopic.comments.length === 0 ? (
-                    <p className="text-xs text-slate-400 py-4 italic">
-                      Belum ada balasan. Jadilah yang pertama memberikan masukan!
-                    </p>
-                  ) : (
-                    activeTopic.comments.map((c) => (
-                      <div
-                        key={c.id}
-                        className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-2"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2.5">
-                            {c.avatar ? (
-                              <img
-                                src={c.avatar}
-                                alt={c.author}
-                                className="w-8 h-8 rounded-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-8 h-8 rounded-full bg-sky-100 text-[#006194] font-bold text-xs flex items-center justify-center">
-                                {c.initials || 'U'}
-                              </div>
-                            )}
-                            <div>
-                              <p className="font-bold text-slate-900 text-xs">{c.author}</p>
-                              <p className="text-[10px] text-slate-400">{c.authorRole}</p>
-                            </div>
-                          </div>
-                          <span className="text-[10px] text-slate-400">{c.timestamp}</span>
-                        </div>
+                  {(() => {
+                    const allChildIds = new Set<string>();
+                    activeTopic.comments.forEach((c) => {
+                      if (c.parentId) {
+                        allChildIds.add(c.id);
+                      } else {
+                        const matchedParent = activeTopic.comments.find(
+                          (parent) => parent.id !== c.id && c.content.startsWith(`@${parent.author}`)
+                        );
+                        if (matchedParent) {
+                          allChildIds.add(c.id);
+                        }
+                      }
+                    });
 
-                        <p className="text-xs text-slate-700 leading-relaxed pl-10">
-                          {c.content}
+                    const topLevelComments = activeTopic.comments.filter((c) => !allChildIds.has(c.id));
+                    const sortedTopLevel = [...topLevelComments].sort((a, b) => {
+                      if (a.isPinned && !b.isPinned) return -1;
+                      if (!a.isPinned && b.isPinned) return 1;
+                      return 0;
+                    });
+
+                    if (sortedTopLevel.length === 0) {
+                      return (
+                        <p className="text-xs text-slate-400 py-4 italic">
+                          Belum ada balasan. Jadilah yang pertama memberikan masukan!
                         </p>
+                      );
+                    }
 
-                        <div className="flex items-center justify-end gap-3 pt-1 text-[11px] font-semibold">
-                          {(() => {
-                            const isLikedByMe = c.likedBy
-                              ? c.likedBy.includes(currentUserId) || c.likedBy.includes(currentUserName)
-                              : userLikedComments.has(c.id);
-
-                            return (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (onLikeComment && activeTopic) {
-                                    onLikeComment(activeTopic.id, c.id);
-                                  }
-                                }}
-                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all border ${
-                                  isLikedByMe
-                                    ? 'bg-sky-100 text-[#006194] border-sky-200 font-bold shadow-2xs'
-                                    : 'text-slate-500 border-slate-200 hover:bg-slate-100 hover:text-[#006194]'
-                                }`}
-                              >
-                                <span className="material-symbols-outlined text-[16px]">thumb_up</span>
-                                <span>{c.likes || 0} Suka</span>
-                              </button>
-                            );
-                          })()}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setNewCommentText(`@${c.author} `);
-                              const el = document.querySelector<HTMLTextAreaElement>('textarea');
-                              if (el) el.focus();
-                            }}
-                            className="px-2 py-1 text-slate-500 hover:text-[#006194] hover:bg-slate-100 rounded-lg transition-all"
-                          >
-                            Balas
-                          </button>
-
-                          {(() => {
-                            const canDelete =
-                              currentUserRole === 'Admin' ||
-                              (c.author && c.author.toLowerCase() === currentUserName.toLowerCase());
-
-                            if (!canDelete) return null;
-
-                            return (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (onDeleteComment && activeTopic) {
-                                    onDeleteComment(activeTopic.id, c.id);
-                                  }
-                                }}
-                                className="px-2 py-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-all flex items-center gap-1"
-                                title={currentUserRole === 'Admin' ? 'Hapus balasan (Hak Akses Admin)' : 'Hapus balasan Anda'}
-                              >
-                                <span className="material-symbols-outlined text-[16px]">delete</span>
-                                <span>Hapus</span>
-                              </button>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                    ))
-                  )}
+                    return sortedTopLevel.map((comment) => renderCommentItem(comment));
+                  })()}
                 </div>
               </div>
 
               {/* Reply Comment Editor */}
               <form onSubmit={handleSendComment} className="pt-4 border-t border-slate-200 space-y-3">
-                <label className="text-xs font-bold text-slate-700 block">Tulis Balasan Diskusi</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-200 block">
+                    {replyParentComment ? (
+                      <span className="flex items-center gap-2 text-[#006194] dark:text-sky-400">
+                        <span className="material-symbols-outlined text-base">reply</span>
+                        Membalas tanggapan <strong>@{replyParentComment.author}</strong>
+                      </span>
+                    ) : (
+                      'Tulis Balasan Diskusi'
+                    )}
+                  </label>
+                  {replyParentComment && (
+                    <button
+                      type="button"
+                      onClick={() => setReplyParentComment(null)}
+                      className="text-[11px] text-rose-500 hover:text-rose-700 font-bold flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-xs">close</span>
+                      <span>Batal Balas Spesifik</span>
+                    </button>
+                  )}
+                </div>
                 <div className="border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#006194]/20 focus-within:border-[#006194]">
                   <textarea
                     value={newCommentText}
                     onChange={(e) => setNewCommentText(e.target.value)}
-                    placeholder="Ketik tanggapan Anda di sini..."
+                    placeholder={
+                      replyParentComment
+                        ? `Ketik balasan Anda untuk @${replyParentComment.author}...`
+                        : 'Ketik tanggapan Anda di sini...'
+                    }
                     rows={3}
-                    className="w-full p-3 text-xs text-slate-800 outline-none resize-none"
+                    className="w-full p-3 text-xs text-slate-800 dark:text-white outline-none resize-none bg-transparent"
                     required
                   />
                 </div>
@@ -450,7 +527,7 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
                     className="px-5 py-2.5 bg-[#006194] text-white rounded-xl text-xs font-bold hover:bg-[#004b73] transition-all flex items-center gap-2"
                   >
                     <span className="material-symbols-outlined text-base">send</span>
-                    <span>Kirim Balasan</span>
+                    <span>{replyParentComment ? 'Kirim Balasan Branch' : 'Kirim Balasan'}</span>
                   </button>
                 </div>
               </form>
