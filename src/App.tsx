@@ -354,11 +354,37 @@ export default function App() {
     const loggedInUser = users.find((u) => u.id === currentUserId) || users[0];
     const loggedInUserName = loggedInUser ? loggedInUser.name : '';
 
+    const isSender = loggedInUserName && commentAuthor.toLowerCase() === loggedInUserName.toLowerCase();
+
+    // The sender of the reply NEVER receives the popup toast on their own screen
+    if (isSender) {
+      // Append notification to global state for the recipient to see when logged in
+      const replyNotifItem: AppNotification = {
+        id: `notif-reply-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        title: `💬 Balasan Komentar dari ${commentAuthor}`,
+        desc: `"${newComment.content || ''}"`,
+        time: 'Baru saja',
+        createdAt: Date.now(),
+        author: commentAuthor,
+        targetUserName: targetAuthor,
+        type: 'info',
+        read: false
+      };
+
+      setNotifications((prev) => {
+        if (prev.some((n) => n.id === replyNotifItem.id || (n.desc === replyNotifItem.desc && n.author === commentAuthor))) {
+          return prev;
+        }
+        return [replyNotifItem, ...prev];
+      });
+      return;
+    }
+
     const isRecipient =
       loggedInUserName && targetAuthor.toLowerCase() === loggedInUserName.toLowerCase();
 
-    // Trigger popup IF logged in user is recipient OR if testing reply
-    if (isRecipient || targetAuthor) {
+    // Trigger popup toast ONLY for the recipient user who is being replied to / mentioned!
+    if (isRecipient) {
       if (!foundTopicId && topicsList.length > 0) {
         foundTopicId = topicsList[0].id;
       }
