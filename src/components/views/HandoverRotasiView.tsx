@@ -796,13 +796,6 @@ export const HandoverRotasiView: React.FC<HandoverRotasiViewProps> = ({
             </div>
 
             <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setPreviewDoc(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
-              >
-                Tutup
-              </button>
-
               {previewDoc.fileType === 'LINK' || previewDoc.linkUrl ? (
                 <a
                   href={previewDoc.linkUrl || '#'}

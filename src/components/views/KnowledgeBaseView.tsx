@@ -269,7 +269,7 @@ export const KnowledgeBaseView: React.FC<KnowledgeBaseViewProps> = ({
 
     try {
       setUploadProgress(40);
-      const finalFileType = hasLink ? 'LINK' : (hasFile ? autoDetectType(selectedFile!.name) : 'LINK');
+      const finalFileType = hasFile ? autoDetectType(selectedFile!.name) : 'LINK';
       const finalContentType = hasLink ? 'link' : 'file';
 
       const calculatedFileSize = hasLink
@@ -553,25 +553,6 @@ export const KnowledgeBaseView: React.FC<KnowledgeBaseViewProps> = ({
                     <p className="text-xs text-slate-500 mt-2 line-clamp-3 leading-relaxed">
                       {art.summary}
                     </p>
-
-                    {(art.fileType === 'LINK' || art.linkUrl) && (
-                      <div
-                        className="mt-3 p-2 bg-indigo-50/80 border border-indigo-200/80 rounded-xl flex items-center gap-2 text-xs text-indigo-900"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <span className="material-symbols-outlined text-sm text-indigo-600 shrink-0">link</span>
-                        <a
-                          href={art.linkUrl || 'https://drive.google.com'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-bold text-indigo-700 hover:text-indigo-900 hover:underline truncate flex-1 min-w-0"
-                          title={art.linkUrl || 'https://drive.google.com'}
-                        >
-                          {art.linkUrl || 'https://drive.google.com'}
-                        </a>
-                        <span className="material-symbols-outlined text-xs text-indigo-500 shrink-0">open_in_new</span>
-                      </div>
-                    )}
                   </div>
 
                   <div className="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
@@ -1141,13 +1122,7 @@ export const KnowledgeBaseView: React.FC<KnowledgeBaseViewProps> = ({
                 </div>
               )}
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPreviewArticle(null)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
-                >
-                  Tutup
-                </button>
+              <div className="flex items-center justify-end gap-2">
                 {previewArticle.fileType === 'LINK' || previewArticle.linkUrl ? (
                   <a
                     href={previewArticle.linkUrl || '#'}
