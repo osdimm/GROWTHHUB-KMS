@@ -100,17 +100,17 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
       <div
         className={`p-3.5 sm:p-4 rounded-xl border transition-all space-y-2 ${
           node.isPinned
-            ? 'bg-amber-50/90 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/40 ring-1 ring-amber-300/50'
+            ? 'bg-amber-50 border-amber-300 ring-1 ring-amber-300/50'
             : isDeleted
-            ? 'bg-slate-100/70 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-800'
-            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800'
+            ? 'bg-slate-100/80 border-slate-200'
+            : 'bg-slate-50 border-slate-200'
         }`}
       >
         {/* Header Badges: Pinned & Collapse Control */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {node.isPinned && (
-              <span className="flex items-center gap-1 text-[11px] font-extrabold text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-500/20 px-2 py-0.5 rounded-md">
+              <span className="flex items-center gap-1 text-[11px] font-extrabold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-md">
                 <span className="material-symbols-outlined text-xs">push_pin</span>
                 <span>Disematkan</span>
               </span>
@@ -119,7 +119,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <button
                 type="button"
                 onClick={() => onToggleCollapse(node.id)}
-                className="text-[11px] font-bold text-slate-500 hover:text-[#006194] bg-slate-200/60 dark:bg-slate-700/60 px-2 py-0.5 rounded-md transition-colors flex items-center gap-1"
+                className="text-[11px] font-bold text-slate-600 hover:text-[#006194] bg-slate-200/70 px-2 py-0.5 rounded-md transition-colors flex items-center gap-1"
                 title={isCollapsed ? 'Tampilkan Balasan' : 'Sembunyikan Balasan'}
               >
                 <span className="material-symbols-outlined text-xs">
@@ -142,12 +142,12 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
                 className="w-8 h-8 rounded-full object-cover border border-slate-200"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-900/60 text-[#006194] dark:text-sky-300 font-bold text-xs flex items-center justify-center border border-sky-200 dark:border-sky-800">
+              <div className="w-8 h-8 rounded-full bg-sky-100 text-[#006194] font-bold text-xs flex items-center justify-center border border-sky-200">
                 {node.initials || 'U'}
               </div>
             )}
             <div>
-              <p className="font-bold text-slate-900 dark:text-white text-xs">{node.author}</p>
+              <p className="font-bold text-slate-900 text-xs">{node.author}</p>
               <p className="text-[10px] text-slate-500 font-medium">{node.authorRole}</p>
             </div>
           </div>
@@ -156,11 +156,11 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
         {/* Comment Body */}
         <div className="pl-10">
           {isDeleted ? (
-            <p className="text-xs text-slate-400 dark:text-slate-500 italic">
+            <p className="text-xs text-slate-400 italic">
               [Komentar telah dihapus]
             </p>
           ) : (
-            <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-line">
+            <p className="text-xs text-slate-800 leading-relaxed whitespace-pre-line">
               {node.content}
             </p>
           )}
@@ -176,7 +176,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               className={`p-1.5 rounded-lg transition-all flex items-center justify-center ${
                 isReplyingThis
                   ? 'bg-sky-100 text-[#006194] font-bold'
-                  : 'text-slate-500 hover:text-[#006194] hover:bg-slate-200/70 dark:hover:bg-slate-700'
+                  : 'text-slate-500 hover:text-[#006194] hover:bg-slate-200/70'
               }`}
               title="Balas Diskusi (Inline)"
             >
@@ -190,8 +190,8 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
                 onClick={() => onTogglePin(activeTopicId, node.id)}
                 className={`p-1.5 rounded-lg transition-all flex items-center justify-center ${
                   node.isPinned
-                    ? 'text-amber-700 bg-amber-100 hover:bg-amber-200'
-                    : 'text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40'
+                    ? 'text-amber-800 bg-amber-100 hover:bg-amber-200'
+                    : 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
                 }`}
                 title={node.isPinned ? 'Lepas Sematan' : 'Sematkan Pesan'}
               >
@@ -204,7 +204,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <button
                 type="button"
                 onClick={() => onDeleteComment(activeTopicId, node.id)}
-                className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-all flex items-center justify-center"
+                className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-all flex items-center justify-center"
                 title="Hapus Balasan"
               >
                 <span className="material-symbols-outlined text-[18px]">delete</span>
@@ -214,10 +214,10 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
         )}
       </div>
 
-      {/* Inline Reply Form (UX Reddit - Appears inline right below the comment!) */}
+      {/* Inline Reply Form */}
       {isReplyingThis && (
-        <div className="ml-4 sm:ml-6 mt-2 p-3 bg-sky-50/70 dark:bg-slate-800/80 border border-sky-200 dark:border-slate-700 rounded-xl space-y-2 animate-in fade-in duration-150">
-          <div className="flex items-center justify-between text-xs text-[#006194] dark:text-sky-300 font-bold">
+        <div className="ml-4 sm:ml-6 mt-2 p-3 bg-sky-50/70 border border-sky-200 rounded-xl space-y-2 animate-in fade-in duration-150">
+          <div className="flex items-center justify-between text-xs text-[#006194] font-bold">
             <span className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-sm">reply</span>
               <span>Membalas @{node.author}</span>
@@ -235,14 +235,14 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
             onChange={(e) => onChangeInlineText(e.target.value)}
             placeholder={`Tulis balasan Anda untuk @${node.author}...`}
             rows={2}
-            className="w-full p-2.5 text-xs text-slate-800 dark:text-white bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-1 focus:ring-[#006194] resize-none"
+            className="w-full p-2.5 text-xs text-slate-800 bg-white border border-slate-200 rounded-lg outline-none focus:ring-1 focus:ring-[#006194] resize-none"
             autoFocus
           />
           <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={onCancelReply}
-              className="px-3 py-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-700 rounded-lg text-xs font-semibold"
+              className="px-3 py-1.5 text-slate-600 hover:bg-slate-200/60 rounded-lg text-xs font-semibold"
             >
               Batal
             </button>
@@ -260,7 +260,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
 
       {/* Children Replies (Nested Branching Tree) */}
       {hasChildren && !isCollapsed && (
-        <div className="ml-3 sm:ml-6 pl-3 sm:pl-4 border-l-2 border-slate-200 dark:border-slate-800 space-y-2 mt-2">
+        <div className="ml-3 sm:ml-6 pl-3 sm:pl-4 border-l-2 border-[#006194]/30 space-y-2 mt-2">
           {node.children.map((child) => (
             <CommentNodeItem
               key={child.id}
