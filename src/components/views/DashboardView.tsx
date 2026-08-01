@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { ActivityLog, PopularTopic, NavigationTab, User, KnowledgeArticle, HandoverDoc } from '../../types';
+import { ActivityLog, PopularTopic, NavigationTab, User, KnowledgeArticle, HandoverDoc, ForumTopic } from '../../types';
+import { initialForumTopics } from '../../data/mockData';
 
 interface DashboardViewProps {
   activities?: ActivityLog[];
-  popularTopics: PopularTopic[];
+  popularTopics?: PopularTopic[];
+  forumTopics?: ForumTopic[];
   setActiveTab: (tab: NavigationTab) => void;
   users?: User[];
   articles?: KnowledgeArticle[];
@@ -11,7 +13,7 @@ interface DashboardViewProps {
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
-  popularTopics,
+  forumTopics = [],
   setActiveTab,
   users = [],
   articles = [],
@@ -25,6 +27,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const totalContentCount = articles.length + handoverDocs.length;
   const totalKbArticles = articles.length;
   const totalHandovers = handoverDocs.length;
+
+  // Derive real Topik Populer from actual forumTopics state (or fallback to initialForumTopics)
+  const displayForumTopics = forumTopics && forumTopics.length > 0 ? forumTopics : initialForumTopics;
+
+  // Sort topics by views and comments to show truly popular topics
+  const sortedPopularTopics = [...displayForumTopics]
+    .sort((a, b) => {
+      const aScore = (a.views || 0) + (a.comments?.length || a.commentCount || 0) * 5;
+      const bScore = (b.views || 0) + (b.comments?.length || b.commentCount || 0) * 5;
+      return bScore - aScore;
+    })
+    .slice(0, 6);
 
   return (
     <div className="space-y-6">
@@ -96,41 +110,61 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="col-span-12 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h4 className="text-lg font-bold text-slate-900">Topik Populer</h4>
-              <span className="text-xs text-slate-400 font-semibold">Pencarian Top</span>
+              <div>
+                <h4 className="text-lg font-bold text-slate-900">Topik Diskusi Populer</h4>
+                <p className="text-xs text-slate-500 mt-0.5">Topik paling aktif didiskusikan oleh anggota tim</p>
+              </div>
+              <button
+                onClick={() => setActiveTab('forum-diskusi')}
+                className="text-xs text-[#006194] hover:underline font-bold flex items-center gap-1"
+              >
+                <span>Lihat Semua Forum</span>
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {popularTopics.map((topic) => (
-                <div
-                  key={topic.id}
-                  onClick={() => setActiveTab('forum-diskusi')}
-                  className="flex items-center gap-3 p-3.5 border border-slate-100 bg-slate-50/50 hover:bg-sky-50/60 rounded-xl transition-colors cursor-pointer group"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 text-[#006194] flex items-center justify-center font-bold text-sm group-hover:bg-sky-100 transition-colors shrink-0">
-                    #{topic.rank}
-                  </div>
-                  <div className="flex-1 overflow-hidden">
-                    <p className="text-sm font-bold text-slate-900 truncate">{topic.title}</p>
-                    <p className="text-xs text-slate-400">{topic.searches.toLocaleString()} pencarian</p>
-                  </div>
-                  <span
-                    className={`material-symbols-outlined text-[20px] shrink-0 ${
-                      topic.trend === 'up'
-                        ? 'text-emerald-500'
-                        : topic.trend === 'down'
-                        ? 'text-red-500'
-                        : 'text-slate-400'
-                    }`}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {sortedPopularTopics.map((topic, idx) => {
+                const commentNum = topic.comments?.length ?? topic.commentCount ?? 0;
+                const viewsNum = topic.views || 0;
+                return (
+                  <div
+                    key={topic.id}
+                    onClick={() => setActiveTab('forum-diskusi')}
+                    className="flex items-center gap-3.5 p-4 border border-slate-200/80 bg-white hover:bg-sky-50/80 hover:border-sky-300 rounded-2xl transition-all cursor-pointer group shadow-2xs"
                   >
-                    {topic.trend === 'up'
-                      ? 'trending_up'
-                      : topic.trend === 'down'
-                      ? 'trending_down'
-                      : 'horizontal_rule'}
-                  </span>
-                </div>
-              ))}
+                    <div className="w-10 h-10 rounded-xl bg-sky-50 text-[#006194] flex items-center justify-center font-black text-sm group-hover:bg-[#006194] group-hover:text-white transition-colors shrink-0">
+                      #{idx + 1}
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="px-2 py-0.5 bg-slate-100 text-[#006194] font-extrabold text-[10px] rounded uppercase shrink-0">
+                          {topic.category}
+                        </span>
+                        <span className="text-[11px] text-slate-400 truncate">
+                          {topic.author.split('(')[0].trim()}
+                        </span>
+                      </div>
+                      <p className="text-xs font-bold text-slate-900 truncate group-hover:text-[#006194] transition-colors">
+                        {topic.title}
+                      </p>
+                      <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-3">
+                        <span className="flex items-center gap-0.5">
+                          <span className="material-symbols-outlined text-[13px] text-slate-400">visibility</span>
+                          {viewsNum.toLocaleString('id-ID')}
+                        </span>
+                        <span className="flex items-center gap-0.5">
+                          <span className="material-symbols-outlined text-[13px] text-slate-400">chat_bubble</span>
+                          {commentNum} komentar
+                        </span>
+                      </p>
+                    </div>
+                    <span className="material-symbols-outlined text-[18px] text-slate-300 group-hover:text-[#006194] group-hover:translate-x-0.5 transition-all shrink-0">
+                      chevron_right
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -138,7 +172,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             onClick={() => setActiveTab('forum-diskusi')}
             className="w-full mt-6 text-[#006194] font-semibold text-xs py-2.5 border border-sky-200 rounded-xl hover:bg-sky-50 transition-colors"
           >
-            Lihat Semua Forum Diskusi
+            Buka Forum Diskusi Lengkap
           </button>
         </div>
       </div>

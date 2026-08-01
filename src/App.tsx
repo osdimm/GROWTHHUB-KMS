@@ -805,6 +805,7 @@ export default function App() {
               <DashboardView
                 activities={activities}
                 popularTopics={popularTopics}
+                forumTopics={forumTopics}
                 setActiveTab={setActiveTab}
                 users={users}
                 articles={articles}
