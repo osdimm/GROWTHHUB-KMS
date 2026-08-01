@@ -461,7 +461,23 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
       .substring(0, 2)
       .toUpperCase();
 
-    const trimmedText = mainCommentText.trim();
+    const rawMainText = mainCommentText.trim();
+    const mentionMatch = rawMainText.match(/@([^\s:]+)/);
+
+    let finalMainContent = rawMainText;
+    if (mentionMatch) {
+      const taggedName = mentionMatch[1];
+      const parentCandidate = activeTopic.comments.find(
+        (p) => p.author.toLowerCase().replace(/\s+/g, '') === taggedName.toLowerCase().replace(/\s+/g, '')
+      );
+      const targetAuthor = parentCandidate ? parentCandidate.author : taggedName;
+
+      const messageBody = rawMainText.replace(/@[^\s:]+\s*/g, '').trim();
+      finalMainContent = messageBody.length > 0 ? `@${targetAuthor} ${messageBody}` : `@${targetAuthor}`;
+      triggerReplyPopup(targetAuthor, currentUserName, finalMainContent);
+    } else {
+      triggerToast('Tanggapan Anda telah dipublikasikan.');
+    }
 
     const newComment: ForumComment = {
       id: `comment-${Date.now()}`,
@@ -469,27 +485,13 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
       authorRole: currentUserRole,
       avatar: undefined,
       initials: initials,
-      content: trimmedText,
+      content: finalMainContent,
       timestamp: 'Baru saja',
       isPinned: false,
       parentId: null
     };
 
     onAddComment(activeTopic.id, newComment);
-
-    // Check if main comment tagged someone with @Author
-    const mentionMatch = trimmedText.match(/^@([^\s:]+)/);
-    if (mentionMatch) {
-      const taggedName = mentionMatch[1];
-      const parentCandidate = activeTopic.comments.find(
-        (p) => p.author.toLowerCase().replace(/\s+/g, '') === taggedName.toLowerCase().replace(/\s+/g, '')
-      );
-      const targetAuthor = parentCandidate ? parentCandidate.author : taggedName;
-      triggerReplyPopup(targetAuthor, currentUserName, trimmedText);
-    } else {
-      triggerToast('Tanggapan Anda telah dipublikasikan.');
-    }
-
     setMainCommentText('');
   };
 
@@ -507,16 +509,10 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
       .substring(0, 2)
       .toUpperCase();
 
-    let rawText = inlineReplyText.trim();
-    let formattedText = rawText;
-
-    // Clean duplicate leading @mentions to guarantee single @TargetAuthor tag
-    if (formattedText.startsWith('@')) {
-      const bodyWithoutTags = formattedText.replace(/^(?:@[^\s:]+\s*)+/, '').trim();
-      formattedText = `@${targetAuthor} ${bodyWithoutTags}`;
-    } else {
-      formattedText = `@${targetAuthor} ${formattedText}`;
-    }
+    // Remove any @tags typed anywhere in text, then prepend clean single `@targetAuthor ` at the very front
+    const rawText = inlineReplyText.trim();
+    const messageBody = rawText.replace(/@[^\s:]+\s*/g, '').trim();
+    const formattedText = messageBody.length > 0 ? `@${targetAuthor} ${messageBody}` : `@${targetAuthor}`;
 
     const newReply: ForumComment = {
       id: `comment-${Date.now()}`,
