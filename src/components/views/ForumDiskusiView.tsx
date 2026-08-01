@@ -236,7 +236,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               }`}
               title="Balas Diskusi (Inline)"
             >
-              <span className="material-symbols-outlined text-[12px]">reply</span>
+              <span className="material-symbols-outlined text-[8px]">reply</span>
             </button>
 
             {/* Pin / Unpin Toggle */}
@@ -251,7 +251,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
                 }`}
                 title={node.isPinned ? 'Lepas Sematan' : 'Sematkan Pesan'}
               >
-                <span className="material-symbols-outlined text-[12px]">push_pin</span>
+                <span className="material-symbols-outlined text-[8px]">push_pin</span>
               </button>
             )}
 
@@ -263,7 +263,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
                 className="p-0.5 text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition-all flex items-center justify-center"
                 title="Hapus Balasan"
               >
-                <span className="material-symbols-outlined text-[12px]">delete</span>
+                <span className="material-symbols-outlined text-[8px]">delete</span>
               </button>
             )}
           </div>
