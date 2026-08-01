@@ -377,6 +377,7 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
   // Inline Reply & Thread Collapse State
   const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
   const [inlineReplyText, setInlineReplyText] = useState('');
+  const [isMainFormExpanded, setIsMainFormExpanded] = useState(false);
   const [collapsedComments, setCollapsedComments] = useState<Set<string>>(new Set());
 
   const divisionsList =
@@ -701,7 +702,10 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                 return (
                   <div
                     key={topic.id}
-                    onClick={() => setSelectedTopicId(topic.id)}
+                    onClick={() => {
+                      setSelectedTopicId(topic.id);
+                      setIsMainFormExpanded(false);
+                    }}
                     className={`p-3 rounded-xl border transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-sky-50/80 dark:bg-slate-800 border-[#006194] dark:border-cyan-400 shadow-sm'
@@ -862,30 +866,85 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                 </div>
               </div>
 
-              {/* ZONA C: FORM INPUT KOMENTAR (Fixed Bottom Sticky Input Form) */}
-              <form onSubmit={handleSendMainComment} className="shrink-0 p-3 sm:p-3.5 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 z-10 space-y-1.5 shadow-xs">
-                <label className="text-[10px] font-extrabold text-slate-900 dark:text-white block">Tulis Balasan Utama</label>
-                <div className="border border-slate-300 dark:border-slate-700 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#006194]/20 dark:focus-within:ring-cyan-500/20 focus-within:border-[#006194] dark:focus-within:border-cyan-400 bg-white dark:bg-slate-900">
-                  <textarea
-                    value={mainCommentText}
-                    onChange={(e) => setMainCommentText(e.target.value)}
-                    placeholder="Ketik tanggapan Anda untuk topik ini..."
-                    rows={2}
-                    className="w-full p-2 text-xs text-slate-900 dark:text-slate-100 font-medium placeholder-slate-500 dark:placeholder-slate-400 bg-white dark:bg-slate-900 outline-none resize-none"
-                    required
-                  />
-                </div>
-
-                <div className="flex justify-end">
+              {/* ZONA C: FORM INPUT KOMENTAR (Option A: Collapsed Trigger Bar by Default / Expand In-Place) */}
+              {!isMainFormExpanded ? (
+                <div className="shrink-0 p-2.5 sm:p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 z-10">
                   <button
-                    type="submit"
-                    className="px-3.5 py-1.5 bg-[#006194] text-white rounded-xl text-xs font-bold hover:bg-[#004b73] transition-all flex items-center gap-1 shadow-sm"
+                    type="button"
+                    onClick={() => setIsMainFormExpanded(true)}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center justify-between transition-all group shadow-2xs cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[15px]">send</span>
-                    <span>Kirim Tanggapan Utama</span>
+                    <span className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-[16px] text-slate-400 group-hover:text-[#006194] dark:group-hover:text-cyan-400 transition-colors">
+                        edit_note
+                      </span>
+                      <span>Tulis tanggapan Anda untuk topik ini...</span>
+                    </span>
+                    <span className="text-[10px] font-bold text-[#006194] dark:text-cyan-400 bg-sky-100 dark:bg-cyan-950/80 px-2.5 py-1 rounded-lg flex items-center gap-1 border border-sky-200 dark:border-sky-800">
+                      <span className="material-symbols-outlined text-[12px]">send</span>
+                      <span>Tanggapi</span>
+                    </span>
                   </button>
                 </div>
-              </form>
+              ) : (
+                <form
+                  onSubmit={(e) => {
+                    handleSendMainComment(e);
+                    setIsMainFormExpanded(false);
+                  }}
+                  className="shrink-0 p-3 sm:p-3.5 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 z-10 space-y-2 shadow-sm animate-in slide-in-from-bottom-2 duration-150"
+                >
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-[14px] text-[#006194] dark:text-cyan-400">edit_note</span>
+                      <span>Tulis Tanggapan Utama</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMainFormExpanded(false);
+                        setMainCommentText('');
+                      }}
+                      className="text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 flex items-center gap-0.5"
+                    >
+                      <span className="material-symbols-outlined text-[13px]">close</span>
+                      <span>Batal</span>
+                    </button>
+                  </div>
+
+                  <div className="border border-slate-300 dark:border-slate-700 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#006194]/20 dark:focus-within:ring-cyan-500/20 focus-within:border-[#006194] dark:focus-within:border-cyan-400 bg-white dark:bg-slate-900">
+                    <textarea
+                      value={mainCommentText}
+                      onChange={(e) => setMainCommentText(e.target.value)}
+                      placeholder="Ketik tanggapan Anda untuk topik ini..."
+                      rows={2}
+                      className="w-full p-2 text-xs text-slate-900 dark:text-slate-100 font-medium placeholder-slate-500 dark:placeholder-slate-400 bg-white dark:bg-slate-900 outline-none resize-none"
+                      autoFocus
+                      required
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMainFormExpanded(false);
+                        setMainCommentText('');
+                      }}
+                      className="px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-3.5 py-1.5 bg-[#006194] text-white rounded-xl text-xs font-bold hover:bg-[#004b73] transition-all flex items-center gap-1 shadow-sm"
+                    >
+                      <span className="material-symbols-outlined text-[15px]">send</span>
+                      <span>Kirim Tanggapan Utama</span>
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           ) : (
             <div className="p-12 text-center text-slate-400 text-xs sm:text-sm my-auto">
