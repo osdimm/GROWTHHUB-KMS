@@ -157,56 +157,55 @@ export const Header: React.FC<HeaderProps> = ({
                   Belum ada notifikasi baru.
                 </div>
               ) : (
-                <div className="p-3 bg-slate-50/50 dark:bg-slate-800/50 space-y-2">
-                  {/* Slider Control Header & Indicator */}
-                  <div className="flex items-center justify-between px-1 text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
-                    <span className="flex items-center gap-1 text-[#006194] dark:text-cyan-400">
-                      <span className="material-symbols-outlined text-xs animate-pulse">swipe_left</span>
-                      Geser ke kanan untuk melihat notifikasi ({notifications.length} Total)
-                    </span>
-                    {notifications.length > 5 && (
-                      <span className="bg-sky-100 dark:bg-cyan-950 text-[#006194] dark:text-cyan-300 px-2 py-0.5 rounded-full font-bold">
-                        Maks. 5 Terlihat / Slide
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Horizontal Scroll / Carousel Container */}
-                  <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 p-1 custom-scrollbar pb-2 scroll-smooth">
-                    {notifications.map((n, idx) => (
-                      <div
-                        key={n.id}
-                        className={`w-[260px] sm:w-[300px] shrink-0 snap-start p-3.5 rounded-2xl border transition-all shadow-xs flex flex-col justify-between ${
-                          !n.read
-                            ? 'bg-sky-50/90 dark:bg-slate-800 border-sky-200 dark:border-cyan-700/80 ring-1 ring-sky-200/50 dark:ring-cyan-500/30'
-                            : 'bg-white dark:bg-slate-900/90 border-slate-200 dark:border-slate-800'
-                        }`}
-                      >
-                        <div className="space-y-1.5">
-                          <div className="flex items-center justify-between text-[11px]">
-                            <span className="font-extrabold text-[#006194] dark:text-cyan-400 truncate max-w-[170px]">
-                              {n.title || `📢 ${n.author || 'Sistem'}`}
-                            </span>
-                            <span className="text-slate-400 dark:text-slate-500 text-[10px] shrink-0">{n.time}</span>
-                          </div>
-                          <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-medium line-clamp-3">
-                            {n.desc}
-                          </p>
-                        </div>
-                        <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[10px]">
-                          <span className="text-slate-400 dark:text-slate-500 font-semibold">
-                            Notifikasi #{idx + 1}
-                          </span>
-                          {!n.read && (
-                            <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-0.5">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                              Belum dibaca
-                            </span>
+                <div className="max-h-[440px] overflow-y-auto p-3 space-y-2.5 custom-scrollbar">
+                  {notifications.map((n, idx) => (
+                    <div
+                      key={n.id}
+                      className={`p-3.5 rounded-2xl border transition-all shadow-xs space-y-2 ${
+                        n.type === 'rejected'
+                          ? 'bg-rose-50/80 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/80 ring-1 ring-rose-300/40 dark:ring-rose-900/40'
+                          : n.type === 'approved'
+                          ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/60'
+                          : !n.read
+                          ? 'bg-sky-50/90 dark:bg-slate-800 border-sky-200 dark:border-cyan-700/80 ring-1 ring-sky-200/50 dark:ring-cyan-500/30'
+                          : 'bg-slate-50/80 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          {n.type === 'rejected' ? (
+                            <span className="material-symbols-outlined text-rose-500 text-base shrink-0">cancel</span>
+                          ) : n.type === 'approved' ? (
+                            <span className="material-symbols-outlined text-emerald-500 text-base shrink-0">check_circle</span>
+                          ) : n.type === 'pending' ? (
+                            <span className="material-symbols-outlined text-amber-500 text-base shrink-0">hourglass_top</span>
+                          ) : (
+                            <span className="material-symbols-outlined text-[#006194] dark:text-cyan-400 text-base shrink-0">notifications</span>
                           )}
+                          <span className="font-extrabold text-xs text-slate-900 dark:text-white truncate">
+                            {n.title || `Notifikasi Sistem`}
+                          </span>
                         </div>
+                        <span className="text-slate-400 dark:text-slate-500 text-[10px] shrink-0 font-medium">{n.time}</span>
                       </div>
-                    ))}
-                  </div>
+
+                      <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-medium whitespace-pre-line break-words pl-5">
+                        {n.desc}
+                      </p>
+
+                      <div className="pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[10px]">
+                        <span className="text-slate-400 dark:text-slate-500 font-semibold">
+                          {n.author ? `Oleh: ${n.author}` : `Notifikasi #${idx + 1}`}
+                        </span>
+                        {!n.read && (
+                          <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                            Belum dibaca
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
