@@ -148,6 +148,7 @@ export interface AppNotification {
   targetDivision?: string;
   targetUserId?: string;
   targetUserName?: string;
+  excludeUploaderName?: string;
   type?: 'approved' | 'rejected' | 'pending' | 'info';
   read?: boolean;
 }

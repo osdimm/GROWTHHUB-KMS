@@ -567,20 +567,34 @@ export default function App() {
       })
     );
 
-    // Rule 2: Notify ALL MEMBERS in the SAME DIVISION when approved
-    const divisionApprovedNotif: AppNotification = {
-      id: `notif-app-${Date.now()}`,
-      title: '✅ Dokumen Baru Dipublikasikan',
-      desc: `Dokumen "${targetDoc.title}" yang diunggah oleh ${targetDoc.author} telah DISETUJUI oleh Manajer (${currentUser.name}) dan kini resmi diterbitkan untuk divisi ${targetDoc.category}.`,
+    // Notification 1: ONLY FOR UPLOADER (Confirmation of approval)
+    const uploaderApprovedNotif: AppNotification = {
+      id: `notif-app-up-${Date.now()}`,
+      title: '✅ Pengajuan Dokumen Disetujui',
+      desc: `Dokumen "${targetDoc.title}" yang Anda unggah telah DISETUJUI oleh Manajer (${currentUser.name}) dan resmi dipublikasikan.${note ? ` Catatan Manajer: "${note}"` : ''}`,
       time: 'Baru saja',
       createdAt: Date.now(),
-      author: targetDoc.author,
-      targetDivision: targetDoc.category,
+      author: currentUser.name,
+      targetUserName: targetDoc.author,
       type: 'approved',
       read: false
     };
 
-    setNotifications((prev) => [divisionApprovedNotif, ...prev]);
+    // Notification 2: FOR ALL OTHER MEMBERS IN THE SAME DIVISION (Study/view recommendation)
+    const divisionMemberNotif: AppNotification = {
+      id: `notif-app-div-${Date.now()}`,
+      title: `📚 Dokumen Baru di Divisi ${targetDoc.category}`,
+      desc: `Ada dokumen baru "${targetDoc.title}" yang diunggah oleh ${targetDoc.author} di divisi ${targetDoc.category}. Silakan lihat dan pelajari dokumen ini.`,
+      time: 'Baru saja',
+      createdAt: Date.now(),
+      author: targetDoc.author,
+      targetDivision: targetDoc.category,
+      excludeUploaderName: targetDoc.author,
+      type: 'approved',
+      read: false
+    };
+
+    setNotifications((prev) => [uploaderApprovedNotif, divisionMemberNotif, ...prev]);
   };
 
   const handleRejectDoc = (docId: string, note?: string) => {
@@ -632,20 +646,30 @@ export default function App() {
       }
     }
 
-    // 1. Direct user notification (e.g. Rejection for uploader only, or uploader confirmation)
+    // 1. Direct user notification (e.g. Rejection for uploader only, or uploader approval confirmation)
     if (n.targetUserId && n.targetUserId === currentUser.id) return true;
-    if (n.targetUserName && n.targetUserName.toLowerCase() === currentUser.name.toLowerCase()) return true;
+    if (n.targetUserName) {
+      return n.targetUserName.toLowerCase() === currentUser.name.toLowerCase();
+    }
 
-    // 2. Division-specific notifications
+    // 2. Division-specific notifications (STRICT DIVISION BOUNDARY: Outside division gets NOTHING)
     if (n.targetDivision) {
       const isSameDivision = currentUser.division && currentUser.division.toLowerCase() === n.targetDivision.toLowerCase();
+      if (!isSameDivision && currentUser.role !== 'Admin') {
+        return false;
+      }
+
+      // If excludeUploaderName matches current user, don't show member study notice to uploader
+      if (n.excludeUploaderName && n.excludeUploaderName.toLowerCase() === currentUser.name.toLowerCase()) {
+        return false;
+      }
 
       // Upload verification: ONLY Manager of the SAME division (or Admin)
       if (n.targetRoles && n.targetRoles.includes('Manajer')) {
         return isSameDivision && (currentUser.role === 'Manajer' || currentUser.role === 'Admin');
       }
 
-      // Approved doc notification: ALL MEMBERS in the SAME division (or Admin)
+      // Approved doc notification for division members
       if (n.type === 'approved') {
         return isSameDivision || currentUser.role === 'Admin';
       }
