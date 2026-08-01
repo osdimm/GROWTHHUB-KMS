@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { CategoryItem, KnowledgeArticle, PendingDoc } from '../../types';
 import { downloadDocumentFile, readFileAsDataURL } from '../../utils/documentDownloader';
 import { uploadFileToSupabaseStorage } from '../../services/supabaseService';
+import { CustomSelect } from '../CustomSelect';
 
 interface KnowledgeBaseViewProps {
   categories: CategoryItem[];
@@ -798,31 +799,17 @@ export const KnowledgeBaseView: React.FC<KnowledgeBaseViewProps> = ({
                 />
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase block mb-1">
-                  Divisi <span className="text-rose-500">*</span>
-                </label>
-                <select
-                  required
-                  value={newArtCat}
-                  onChange={(e) => {
-                    setNewArtCat(e.target.value);
-                    setFileError(null);
-                  }}
-                  className={`w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#006194]/20 outline-none transition-colors ${
-                    !newArtCat ? 'text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'
-                  }`}
-                >
-                  <option value="" disabled hidden>
-                    Pilih Divisi
-                  </option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.name} className="text-slate-800 dark:text-slate-100">
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <CustomSelect
+                label="Divisi"
+                required
+                options={categories.map((c) => c.name)}
+                value={newArtCat}
+                onChange={(val) => {
+                  setNewArtCat(val);
+                  setFileError(null);
+                }}
+                placeholder="Pilih Divisi"
+              />
 
               <div>
                 <label className="text-xs font-bold text-slate-600 uppercase block mb-1">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ForumTopic, ForumComment, CategoryItem } from '../../types';
+import { CustomSelect } from '../CustomSelect';
 
 interface ForumDiskusiViewProps {
   topics: ForumTopic[];
@@ -957,28 +958,14 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                 />
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase block mb-1">
-                  Kategori Divisi <span className="text-rose-500">*</span>
-                </label>
-                <select
-                  required
-                  value={newTopicCategory}
-                  onChange={(e) => setNewTopicCategory(e.target.value)}
-                  className={`w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold outline-none focus:ring-1 focus:ring-[#006194] transition-colors ${
-                    !newTopicCategory ? 'text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200'
-                  }`}
-                >
-                  <option value="" disabled hidden>
-                    Pilih Kategori Divisi
-                  </option>
-                  {divisionsList.map((d) => (
-                    <option key={d} value={d} className="text-slate-800 dark:text-slate-200">
-                      {d}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <CustomSelect
+                label="Kategori Divisi"
+                required
+                options={divisionsList}
+                value={newTopicCategory}
+                onChange={setNewTopicCategory}
+                placeholder="Pilih Kategori Divisi"
+              />
 
               <div>
                 <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase block mb-1">

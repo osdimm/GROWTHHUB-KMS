@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { HandoverDoc } from '../../types';
 import { downloadDocumentFile, readFileAsDataURL } from '../../utils/documentDownloader';
 import { uploadFileToSupabaseStorage } from '../../services/supabaseService';
+import { CustomSelect } from '../CustomSelect';
 
 interface HandoverRotasiViewProps {
   handoverDocs: HandoverDoc[];
@@ -571,57 +572,29 @@ export const HandoverRotasiView: React.FC<HandoverRotasiViewProps> = ({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
-                <div>
-                  <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase block mb-1.5">
-                    Periode Rotasi <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    required
-                    value={period}
-                    onChange={(e) => {
-                      setPeriod(e.target.value);
-                      setFileError(null);
-                    }}
-                    className={`w-full h-[40px] px-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#006194]/20 focus:border-[#006194] outline-none transition-colors ${
-                      !period ? 'text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Pilih Periode Rotasi
-                    </option>
-                    {periodsList.map((p) => (
-                      <option key={p} value={p} className="text-slate-800 dark:text-slate-100">
-                        {p}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <CustomSelect
+                  label="Periode Rotasi"
+                  required
+                  options={periodsList}
+                  value={period}
+                  onChange={(val) => {
+                    setPeriod(val);
+                    setFileError(null);
+                  }}
+                  placeholder="Pilih Periode Rotasi"
+                />
 
-                <div>
-                  <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase block mb-1.5">
-                    Divisi <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    required
-                    value={division}
-                    onChange={(e) => {
-                      setDivision(e.target.value);
-                      setFileError(null);
-                    }}
-                    className={`w-full h-[40px] px-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#006194]/20 focus:border-[#006194] outline-none transition-colors ${
-                      !division ? 'text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Pilih Divisi
-                    </option>
-                    {divisions.filter((d) => d !== 'Semua').map((d) => (
-                      <option key={d} value={d} className="text-slate-800 dark:text-slate-100">
-                        {d}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <CustomSelect
+                  label="Divisi"
+                  required
+                  options={divisions.filter((d) => d !== 'Semua')}
+                  value={division}
+                  onChange={(val) => {
+                    setDivision(val);
+                    setFileError(null);
+                  }}
+                  placeholder="Pilih Divisi"
+                />
               </div>
 
               {/* Unggah Berkas File */}
