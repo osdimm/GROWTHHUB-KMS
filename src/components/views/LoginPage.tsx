@@ -56,29 +56,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
   return (
     <div className="bg-[#f7f9fb] text-[#191c1e] min-h-screen flex flex-col justify-between relative overflow-hidden font-sans">
-      {/* Background Graphic Decorative Pattern (Clean Geometric Mesh & Ambient Glow) */}
-      <div className="fixed top-0 right-0 w-1/3 h-screen pointer-events-none opacity-25 hidden lg:block overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-bl from-sky-400/10 via-[#006194]/10 to-transparent" />
-        <svg
-          className="absolute inset-0 w-full h-full text-[#006194]/15"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-        >
-          <defs>
-            <pattern id="login-grid-pattern" width="48" height="48" patternUnits="userSpaceOnUse">
-              <path d="M 48 0 L 0 0 0 48" fill="none" stroke="currentColor" strokeWidth="1" />
-              <circle cx="48" cy="48" r="2" fill="currentColor" opacity="0.5" />
-            </pattern>
-            <radialGradient id="login-glow" cx="70%" cy="30%" r="60%">
-              <stop offset="0%" stopColor="#006194" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="#006194" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#login-grid-pattern)" />
-          <rect width="100%" height="100%" fill="url(#login-glow)" />
-        </svg>
-      </div>
-
       {/* Main Container */}
       <main className="flex-grow flex items-center justify-center p-6 z-10">
         <div className="w-full max-w-[460px] bg-white rounded-2xl border border-slate-200 shadow-xl flex flex-col p-8 md:p-10 my-auto">
