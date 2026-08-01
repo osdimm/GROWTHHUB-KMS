@@ -92,62 +92,22 @@ export default function App() {
   });
   const [showForcePasswordModal, setShowForcePasswordModal] = useState<boolean>(true);
 
-  // Theme Mode State (default to 'light' mode)
-  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
-    const saved = localStorage.getItem('kms_theme');
-    if (!saved) {
-      localStorage.setItem('kms_theme', 'light');
-      return 'light';
-    }
-    return (saved as ThemeMode) || 'light';
-  });
+  // Theme Mode State (permanently default to 'light' mode)
+  const [themeMode, setThemeMode] = useState<ThemeMode>('light');
 
+  // One-time cleanup & Light Mode enforcement on mount
   useEffect(() => {
-    const applyTheme = (mode: ThemeMode) => {
-      const root = document.documentElement;
-      const body = document.body;
-      let isDark = false;
-
-      if (mode === 'dark') {
-        isDark = true;
-      } else if (mode === 'light') {
-        isDark = false;
-      } else {
-        isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      }
-
-      if (isDark) {
-        root.classList.add('dark');
-        body.classList.add('dark');
-        root.style.colorScheme = 'dark';
-      } else {
-        root.classList.remove('dark');
-        body.classList.remove('dark');
-        root.style.colorScheme = 'light';
-      }
-      localStorage.setItem('kms_theme', mode);
-    };
-
-    applyTheme(themeMode);
-
-    if (themeMode === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const listener = (e: MediaQueryListEvent) => {
-        const isDarkSys = e.matches;
-        if (isDarkSys) {
-          document.documentElement.classList.add('dark');
-          document.body.classList.add('dark');
-          document.documentElement.style.colorScheme = 'dark';
-        } else {
-          document.documentElement.classList.remove('dark');
-          document.body.classList.remove('dark');
-          document.documentElement.style.colorScheme = 'light';
-        }
-      };
-      mediaQuery.addEventListener('change', listener);
-      return () => mediaQuery.removeEventListener('change', listener);
+    try {
+      localStorage.removeItem('kms_theme');
+    } catch (e) {
+      console.error(e);
     }
-  }, [themeMode]);
+    const root = document.documentElement;
+    const body = document.body;
+    root.classList.remove('dark');
+    body.classList.remove('dark');
+    root.style.colorScheme = 'light';
+  }, []);
 
   // Save session state to sessionStorage & localStorage
   useEffect(() => {
