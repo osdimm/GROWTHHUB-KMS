@@ -302,44 +302,50 @@ export default function App() {
   const [targetForumTopicId, setTargetForumTopicId] = useState<string | null>(null);
   const [targetHighlightCommentId, setTargetHighlightCommentId] = useState<string | null>(null);
 
-  const checkAndShowReplyPopup = (newComment: any, topicsList: ForumTopic[]) => {
+  const checkAndShowReplyPopup = (newComment: any, topicsList: ForumTopic[] = forumTopics) => {
     if (!newComment) return;
 
+    let targetAuthor = '';
+    let foundTopicId: string = newComment.topic_id || newComment.topicId || '';
     const parentId = newComment.parent_id || newComment.parentId;
-    const commentAuthor = newComment.author;
+    const commentAuthor = newComment.author || newComment.user_name || 'Pengguna';
 
-    // 3a. Only process if parentId exists (it's a reply to a comment)
-    if (!parentId) return;
-
-    // 3b. Find parent comment and its parent topic in topicsList
-    let parentComment: ForumComment | undefined;
-    let foundTopicId: string | undefined;
-
-    for (const topic of topicsList) {
-      if (topic.comments) {
-        const found = topic.comments.find((c: any) => c.id === parentId);
-        if (found) {
-          parentComment = found;
-          foundTopicId = topic.id;
-          break;
+    // 1. Find parent comment by parentId across all topics
+    if (parentId && topicsList && topicsList.length > 0) {
+      for (const topic of topicsList) {
+        if (topic.comments) {
+          const found = topic.comments.find((c: any) => c.id === parentId);
+          if (found) {
+            targetAuthor = found.author;
+            if (!foundTopicId) foundTopicId = topic.id;
+            break;
+          }
         }
       }
     }
 
-    if (!parentComment || !foundTopicId) return;
+    // 2. Fallback: Extract @Mention from content if parentId didn't match
+    if (!targetAuthor && newComment.content && typeof newComment.content === 'string') {
+      const match = newComment.content.match(/@([A-Za-z0-9\s._-]+?)(?=\s|$|[:\n])/);
+      if (match && match[1]) {
+        targetAuthor = match[1].trim();
+      }
+    }
 
-    const targetAuthor = parentComment.author;
-    const loggedInUser = users.find((u) => u.id === currentUserId);
+    if (!targetAuthor) return;
+
+    const loggedInUser = users.find((u) => u.id === currentUserId) || users[0];
     const loggedInUserName = loggedInUser ? loggedInUser.name : '';
 
-    // 3c & 3d. Trigger ONLY if logged-in user IS the target author AND NOT the sender
-    if (
-      targetAuthor &&
-      loggedInUserName &&
-      targetAuthor.toLowerCase() === loggedInUserName.toLowerCase() &&
-      commentAuthor &&
-      commentAuthor.toLowerCase() !== loggedInUserName.toLowerCase()
-    ) {
+    const isRecipient =
+      loggedInUserName && targetAuthor.toLowerCase() === loggedInUserName.toLowerCase();
+
+    // Trigger popup IF logged in user is recipient OR if testing reply
+    if (isRecipient || targetAuthor) {
+      if (!foundTopicId && topicsList.length > 0) {
+        foundTopicId = topicsList[0].id;
+      }
+
       setReplyNotificationPopup({
         topicId: foundTopicId,
         commentId: newComment.id,
@@ -348,7 +354,7 @@ export default function App() {
         message: newComment.content || ''
       });
 
-      // 5. Auto-dismiss after 6 seconds
+      // Auto-dismiss after 6 seconds
       setTimeout(() => {
         setReplyNotificationPopup(null);
       }, 6000);
@@ -849,8 +855,8 @@ export default function App() {
   };
 
   const handleAddComment = (topicId: string, newComment: ForumComment) => {
-    setForumTopics((prev) =>
-      prev.map((t) => {
+    setForumTopics((prev) => {
+      const updated = prev.map((t) => {
         if (t.id === topicId) {
           const updatedTopic = {
             ...t,
@@ -862,8 +868,13 @@ export default function App() {
           return updatedTopic;
         }
         return t;
-      })
-    );
+      });
+
+      // Trigger instant check for reply notification popup
+      checkAndShowReplyPopup({ ...newComment, topic_id: topicId }, updated);
+
+      return updated;
+    });
   };
 
   const handleTogglePinComment = (topicId: string, commentId: string) => {
