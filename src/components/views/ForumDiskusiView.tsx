@@ -630,7 +630,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
   const commentTree = activeTopic ? buildCommentTree(activeTopic.comments) : [];
 
   return (
-    <div className="space-y-4 lg:h-[calc(100vh-125px)] lg:flex lg:flex-col lg:overflow-hidden">
+    <div className="space-y-3 lg:h-[calc(100vh-115px)] lg:flex lg:flex-col lg:overflow-hidden">
       {/* Header */}
       <div className="shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
         <div>
@@ -652,9 +652,9 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
       </div>
 
       {/* Main Forum Split Container */}
-      <div className="grid grid-cols-12 gap-6 items-start lg:items-stretch lg:flex-1 lg:overflow-hidden min-h-0">
+      <div className="grid grid-cols-12 gap-5 items-start lg:items-stretch lg:flex-1 lg:overflow-hidden min-h-0">
         {/* Left Topic List Panel */}
-        <div className="col-span-12 lg:col-span-5 xl:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col lg:h-full lg:overflow-hidden space-y-3">
+        <div className="col-span-12 lg:col-span-5 xl:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 shadow-sm flex flex-col lg:h-full lg:overflow-hidden space-y-2.5">
           {/* Division Filter Controls (Fixed Top) */}
           <div className="shrink-0 space-y-2">
             <div className="flex items-center gap-2">
@@ -702,13 +702,13 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                   <div
                     key={topic.id}
                     onClick={() => setSelectedTopicId(topic.id)}
-                    className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
+                    className={`p-3 rounded-xl border transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-sky-50/80 dark:bg-slate-800 border-[#006194] dark:border-cyan-400 shadow-sm'
                         : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] font-bold text-[#006194] dark:text-cyan-300 bg-sky-100 dark:bg-cyan-950 px-2 py-0.5 rounded">
                         {topic.category}
                       </span>
@@ -721,7 +721,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                       {topic.title}
                     </h4>
 
-                    <div className="mt-2.5 flex items-center justify-between text-xs">
+                    <div className="mt-2 flex items-center justify-between text-xs">
                       <span className="font-semibold text-slate-700 dark:text-slate-400 truncate max-w-[140px] text-[11px]">
                         {topic.author}
                       </span>
@@ -741,68 +741,68 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
         <div className="col-span-12 lg:col-span-7 xl:col-span-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm flex flex-col lg:h-full lg:overflow-hidden min-h-0">
           {activeTopic ? (
             <div className="flex flex-col h-full overflow-hidden">
-              {/* ZONA A: HEADER TOPIK (Fixed Top Header) */}
-              <div className="shrink-0 p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 z-10 space-y-3">
+              {/* ZONA A: HEADER TOPIK (Compact Fixed Top Header) */}
+              <div className="shrink-0 p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 z-10 space-y-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="px-2.5 py-0.5 bg-sky-100 dark:bg-sky-950/80 text-[#006194] dark:text-sky-300 text-[11px] font-bold rounded-md flex items-center gap-1 border border-sky-200 dark:border-sky-800">
-                      <span className="material-symbols-outlined text-[14px]">corporate_fare</span>
+                    <span className="px-2.5 py-0.5 bg-sky-100 dark:bg-sky-950/80 text-[#006194] dark:text-sky-300 text-[10px] font-bold rounded-md flex items-center gap-1 border border-sky-200 dark:border-sky-800">
+                      <span className="material-symbols-outlined text-[13px]">corporate_fare</span>
                       <span>Divisi Topik: {activeTopic.category}</span>
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
                       {activeTopic.date} • {activeTopic.time}
                     </span>
                     {currentUserRole === 'Admin' && onDeleteTopic && (
                       <button
                         type="button"
                         onClick={() => setDeleteConfirmTopic(activeTopic)}
-                        className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg text-[11px] font-bold hover:bg-rose-100 transition-all flex items-center gap-1 shadow-2xs"
+                        className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg text-[10px] font-bold hover:bg-rose-100 transition-all flex items-center gap-1 shadow-2xs"
                         title="Hapus Topik Diskusi (Khusus Admin)"
                       >
-                        <span className="material-symbols-outlined text-[14px]">delete</span>
+                        <span className="material-symbols-outlined text-[13px]">delete</span>
                         <span>Hapus Topik</span>
                       </button>
                     )}
                   </div>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug">
+                <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-snug">
                   {activeTopic.title}
                 </h3>
 
                 {/* Author Info */}
-                <div className="flex items-center gap-2.5 p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
                   {activeTopic.authorAvatar ? (
                     <img
                       src={activeTopic.authorAvatar}
                       alt={activeTopic.author}
-                      className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700 shrink-0"
+                      className="w-7 h-7 rounded-full object-cover border border-slate-200 dark:border-slate-700 shrink-0"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-[#006194] text-white font-bold text-xs flex items-center justify-center shadow-xs shrink-0">
+                    <div className="w-7 h-7 rounded-full bg-[#006194] text-white font-bold text-xs flex items-center justify-center shadow-xs shrink-0">
                       {activeTopic.authorInitials || 'U'}
                     </div>
                   )}
-                  <div>
-                    <p className="font-bold text-slate-900 dark:text-white text-xs">{activeTopic.author}</p>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{activeTopic.authorRole}</p>
+                  <div className="flex items-baseline gap-1.5 min-w-0">
+                    <p className="font-bold text-slate-900 dark:text-white text-xs truncate">{activeTopic.author}</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">• {activeTopic.authorRole}</p>
                   </div>
                 </div>
 
                 {/* Post Content Body */}
-                <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line max-h-36 overflow-y-auto custom-scrollbar pr-1">
+                <div className="text-xs text-slate-700 dark:text-slate-300 leading-snug whitespace-pre-line max-h-24 sm:max-h-28 overflow-y-auto custom-scrollbar pr-1">
                   {activeTopic.content}
                 </div>
 
                 {/* Tags */}
                 {activeTopic.tags && activeTopic.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 pt-1">
+                  <div className="flex flex-wrap gap-1 pt-0.5">
                     {activeTopic.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-semibold rounded-md border border-slate-200/60 dark:border-slate-700"
+                        className="px-2 py-0.2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[9px] font-semibold rounded-md border border-slate-200/60 dark:border-slate-700"
                       >
                         #{tag}
                       </span>
@@ -811,25 +811,25 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                 )}
               </div>
 
-              {/* ZONA B: AREA KOMENTAR (Internal Independent Scroll) */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-5 pr-2.5 space-y-3 bg-slate-50/30 dark:bg-slate-950/20">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-200/70 dark:border-slate-800">
+              {/* ZONA B: AREA KOMENTAR (Internal Independent Scroll - Full Flex-1 with min-h-[350px]) */}
+              <div className="flex-1 min-h-[350px] overflow-y-auto custom-scrollbar p-3.5 sm:p-4 pr-2 space-y-2.5 bg-slate-50/30 dark:bg-slate-950/20">
+                <div className="flex items-center justify-between pb-1.5 border-b border-slate-200/70 dark:border-slate-800">
                   <h4 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[#006194] dark:text-cyan-400 text-[18px]">question_answer</span>
+                    <span className="material-symbols-outlined text-[#006194] dark:text-cyan-400 text-[16px]">question_answer</span>
                     <span>Diskusi Balasan ({activeTopic.comments ? activeTopic.comments.length : 0})</span>
                   </h4>
                   {collapsedComments.size > 0 && (
                     <button
                       type="button"
                       onClick={() => setCollapsedComments(new Set())}
-                      className="text-[11px] font-semibold text-[#006194] dark:text-cyan-400 hover:underline"
+                      className="text-[10px] font-semibold text-[#006194] dark:text-cyan-400 hover:underline"
                     >
                       Buka Semua Thread
                     </button>
                   )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {commentTree.length === 0 ? (
                     <p className="text-xs text-slate-400 py-6 italic text-center">
                       Belum ada balasan. Jadilah yang pertama memberikan masukan!
@@ -863,15 +863,15 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
               </div>
 
               {/* ZONA C: FORM INPUT KOMENTAR (Fixed Bottom Sticky Input Form) */}
-              <form onSubmit={handleSendMainComment} className="shrink-0 p-3.5 sm:p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 z-10 space-y-2 shadow-xs">
-                <label className="text-[11px] font-extrabold text-slate-900 dark:text-white block">Tulis Balasan Utama</label>
+              <form onSubmit={handleSendMainComment} className="shrink-0 p-3 sm:p-3.5 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 z-10 space-y-1.5 shadow-xs">
+                <label className="text-[10px] font-extrabold text-slate-900 dark:text-white block">Tulis Balasan Utama</label>
                 <div className="border border-slate-300 dark:border-slate-700 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#006194]/20 dark:focus-within:ring-cyan-500/20 focus-within:border-[#006194] dark:focus-within:border-cyan-400 bg-white dark:bg-slate-900">
                   <textarea
                     value={mainCommentText}
                     onChange={(e) => setMainCommentText(e.target.value)}
                     placeholder="Ketik tanggapan Anda untuk topik ini..."
                     rows={2}
-                    className="w-full p-2.5 text-xs text-slate-900 dark:text-slate-100 font-medium placeholder-slate-500 dark:placeholder-slate-400 bg-white dark:bg-slate-900 outline-none resize-none"
+                    className="w-full p-2 text-xs text-slate-900 dark:text-slate-100 font-medium placeholder-slate-500 dark:placeholder-slate-400 bg-white dark:bg-slate-900 outline-none resize-none"
                     required
                   />
                 </div>
@@ -879,9 +879,9 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-[#006194] text-white rounded-xl text-xs font-bold hover:bg-[#004b73] transition-all flex items-center gap-1.5 shadow-sm"
+                    className="px-3.5 py-1.5 bg-[#006194] text-white rounded-xl text-xs font-bold hover:bg-[#004b73] transition-all flex items-center gap-1 shadow-sm"
                   >
-                    <span className="material-symbols-outlined text-[16px]">send</span>
+                    <span className="material-symbols-outlined text-[15px]">send</span>
                     <span>Kirim Tanggapan Utama</span>
                   </button>
                 </div>
