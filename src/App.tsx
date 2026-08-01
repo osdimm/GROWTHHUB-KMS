@@ -95,13 +95,15 @@ export default function App() {
   // Theme Mode State (light | dark | system)
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     const saved = localStorage.getItem('kms_theme');
-    return (saved as ThemeMode) || 'system';
+    return (saved as ThemeMode) || 'light';
   });
 
   useEffect(() => {
     const applyTheme = (mode: ThemeMode) => {
       const root = document.documentElement;
+      const body = document.body;
       let isDark = false;
+
       if (mode === 'dark') {
         isDark = true;
       } else if (mode === 'light') {
@@ -112,8 +114,12 @@ export default function App() {
 
       if (isDark) {
         root.classList.add('dark');
+        body.classList.add('dark');
+        root.style.colorScheme = 'dark';
       } else {
         root.classList.remove('dark');
+        body.classList.remove('dark');
+        root.style.colorScheme = 'light';
       }
       localStorage.setItem('kms_theme', mode);
     };
@@ -123,10 +129,15 @@ export default function App() {
     if (themeMode === 'system') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       const listener = (e: MediaQueryListEvent) => {
-        if (e.matches) {
+        const isDarkSys = e.matches;
+        if (isDarkSys) {
           document.documentElement.classList.add('dark');
+          document.body.classList.add('dark');
+          document.documentElement.style.colorScheme = 'dark';
         } else {
           document.documentElement.classList.remove('dark');
+          document.body.classList.remove('dark');
+          document.documentElement.style.colorScheme = 'light';
         }
       };
       mediaQuery.addEventListener('change', listener);
@@ -842,7 +853,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fb] text-[#191c1e] font-sans antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-[#f7f9fb] dark:bg-[#0A0A0F] text-[#191c1e] dark:text-[#F0F0F5] font-sans antialiased overflow-x-hidden">
       {/* Navigation Sidebar */}
       <Sidebar
         activeTab={activeTab}
