@@ -396,7 +396,8 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
                               {c.content}
                             </p>
 
-                            <div className="flex items-center justify-end gap-2 pt-1 text-[11px] font-semibold">
+                            <div className="flex items-center justify-end gap-1 pt-1 text-[11px]">
+                              {/* Reply Button (Icon only) */}
                               <button
                                 type="button"
                                 onClick={() => {
@@ -404,13 +405,13 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
                                   const el = document.querySelector<HTMLTextAreaElement>('textarea');
                                   if (el) el.focus();
                                 }}
-                                className="px-2.5 py-1 text-slate-600 hover:text-[#006194] hover:bg-slate-200/70 rounded-lg transition-all flex items-center gap-1"
+                                className="p-1.5 text-slate-500 hover:text-[#006194] hover:bg-slate-200/70 rounded-lg transition-all flex items-center justify-center"
+                                title="Balas Diskusi"
                               >
-                                <span className="material-symbols-outlined text-[15px]">reply</span>
-                                <span>Balas</span>
+                                <span className="material-symbols-outlined text-[18px]">reply</span>
                               </button>
 
-                              {/* Pin / Unpin Button - ALWAYS VISIBLE NEXT TO BALAS */}
+                              {/* Pin / Unpin Button (Icon only) */}
                               {activeTopic && (
                                 <button
                                   type="button"
@@ -419,27 +420,26 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
                                       onTogglePinComment(activeTopic.id, c.id);
                                     }
                                   }}
-                                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                                  className={`p-1.5 rounded-lg transition-all flex items-center justify-center ${
                                     c.isPinned
-                                      ? 'text-amber-800 bg-amber-100 hover:bg-amber-200 font-bold'
+                                      ? 'text-amber-700 bg-amber-100 hover:bg-amber-200'
                                       : 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
                                   }`}
                                   title={c.isPinned ? 'Lepas Sematan' : 'Sematkan Pesan'}
                                 >
-                                  <span className="material-symbols-outlined text-[15px]">push_pin</span>
-                                  <span>{c.isPinned ? 'Lepas Sematan' : 'Sematkan'}</span>
+                                  <span className="material-symbols-outlined text-[18px]">push_pin</span>
                                 </button>
                               )}
 
+                              {/* Delete Button (Icon only) */}
                               {canDelete && onDeleteComment && activeTopic && (
                                 <button
                                   type="button"
                                   onClick={() => onDeleteComment(activeTopic.id, c.id)}
-                                  className="px-2.5 py-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-all flex items-center gap-1"
-                                  title="Hapus balasan"
+                                  className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-all flex items-center justify-center"
+                                  title="Hapus Balasan"
                                 >
-                                  <span className="material-symbols-outlined text-[15px]">delete</span>
-                                  <span>Hapus</span>
+                                  <span className="material-symbols-outlined text-[18px]">delete</span>
                                 </button>
                               )}
                             </div>
