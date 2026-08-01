@@ -66,10 +66,17 @@ import { LaporanPenggunaanView } from './components/views/LaporanPenggunaanView'
 import { ProfilPenggunaView } from './components/views/ProfilPenggunaView';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<NavigationTab>(() => {
-    const saved = localStorage.getItem('kms_active_tab');
-    return (saved as NavigationTab) || 'dashboard';
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    return sessionStorage.getItem('kms_is_logged_in') === 'true';
   });
+
+  const [activeTab, setActiveTab] = useState<NavigationTab>(() => {
+    const savedLoggedIn = sessionStorage.getItem('kms_is_logged_in') === 'true';
+    if (!savedLoggedIn) return 'login';
+    const savedTab = localStorage.getItem('kms_active_tab');
+    return (savedTab as NavigationTab) || 'dashboard';
+  });
+
   const [globalSearch, setGlobalSearch] = useState('');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -84,10 +91,16 @@ export default function App() {
   });
   const [showForcePasswordModal, setShowForcePasswordModal] = useState<boolean>(true);
 
-  // Save session state to localStorage
+  // Save session state to sessionStorage & localStorage
   useEffect(() => {
-    localStorage.setItem('kms_active_tab', activeTab);
-  }, [activeTab]);
+    if (isLoggedIn) {
+      sessionStorage.setItem('kms_is_logged_in', 'true');
+      localStorage.setItem('kms_active_tab', activeTab);
+    } else {
+      sessionStorage.removeItem('kms_is_logged_in');
+      localStorage.removeItem('kms_active_tab');
+    }
+  }, [isLoggedIn, activeTab]);
 
   useEffect(() => {
     localStorage.setItem('kms_active_role', activeRole);
@@ -677,12 +690,14 @@ export default function App() {
   };
 
 
-  // If tab is 'login', render full-screen login page
-  if (activeTab === 'login') {
+  // If user is not logged in or activeTab is 'login', render full-screen login page
+  if (!isLoggedIn || activeTab === 'login') {
     return (
       <LoginPage
         users={users}
         onLoginSuccess={(user) => {
+          setIsLoggedIn(true);
+          sessionStorage.setItem('kms_is_logged_in', 'true');
           setCurrentUserId(user.id);
           setActiveRole(user.role);
           setShowForcePasswordModal(!!user.mustChangePassword);
@@ -696,6 +711,8 @@ export default function App() {
         }}
         onRegisterAssociate={(newUser) => {
           setUsers((prev) => [newUser, ...prev]);
+          setIsLoggedIn(true);
+          sessionStorage.setItem('kms_is_logged_in', 'true');
           setCurrentUserId(newUser.id);
           setActiveRole('Associate');
           setActiveTab('knowledge-base');
@@ -967,6 +984,9 @@ export default function App() {
         onClose={() => setShowLogoutModal(false)}
         onConfirm={() => {
           setShowLogoutModal(false);
+          setIsLoggedIn(false);
+          sessionStorage.removeItem('kms_is_logged_in');
+          localStorage.removeItem('kms_active_tab');
           setActiveTab('login');
         }}
       />
