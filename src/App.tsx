@@ -762,7 +762,7 @@ export default function App() {
       />
 
       {/* Main App Container */}
-      <main className="pt-20 pb-12 lg:ml-[280px] px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-all">
+      <main className="pt-20 pb-12 lg:ml-[280px] px-4 sm:px-6 lg:px-8 w-full max-w-[1700px] transition-all">
         {/* Force Password Change Sticky Alert Banner */}
         {currentUser.mustChangePassword && activeTab !== 'profil-pengguna' && (
           <div className="bg-amber-500 text-white p-4 rounded-2xl shadow-lg border border-amber-600 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs mb-6 font-medium animate-in fade-in duration-200">
