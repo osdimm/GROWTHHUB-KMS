@@ -149,7 +149,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
     <div className={`space-y-2 relative ${depth > 0 ? 'mt-2' : 'mt-3'}`}>
       {/* Main Comment Card */}
       <div
-        className={`p-3.5 sm:p-4 rounded-xl border transition-all space-y-2 ${
+        className={`p-2.5 sm:p-3 rounded-xl border transition-all space-y-1.5 ${
           node.isPinned
             ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700/60 ring-1 ring-amber-300/50'
             : isDeleted
@@ -161,8 +161,8 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {node.isPinned && (
-              <span className="flex items-center gap-1 text-[11px] font-extrabold text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 px-2 py-0.5 rounded-md">
-                <span className="material-symbols-outlined text-xs">push_pin</span>
+              <span className="flex items-center gap-1 text-[10px] font-extrabold text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 px-1.5 py-0.5 rounded-md">
+                <span className="material-symbols-outlined text-[13px]">push_pin</span>
                 <span>Disematkan</span>
               </span>
             )}
@@ -170,10 +170,10 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <button
                 type="button"
                 onClick={() => onToggleCollapse(node.id)}
-                className="text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:text-[#006194] dark:hover:text-cyan-400 bg-slate-200/70 dark:bg-slate-700/70 px-2 py-0.5 rounded-md transition-colors flex items-center gap-1"
+                className="text-[10px] font-bold text-slate-600 dark:text-slate-300 hover:text-[#006194] dark:hover:text-cyan-400 bg-slate-200/70 dark:bg-slate-700/70 px-1.5 py-0.5 rounded-md transition-colors flex items-center gap-1"
                 title={isCollapsed ? 'Tampilkan Balasan' : 'Sembunyikan Balasan'}
               >
-                <span className="material-symbols-outlined text-xs">
+                <span className="material-symbols-outlined text-[13px]">
                   {isCollapsed ? 'add' : 'remove'}
                 </span>
                 <span>{isCollapsed ? `+${node.children.length} Balasan` : 'Collapse'}</span>
@@ -185,33 +185,33 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
 
         {/* Comment Author Header */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             {node.avatar ? (
               <img
                 src={node.avatar}
                 alt={node.author}
-                className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700"
+                className="w-7 h-7 rounded-full object-cover border border-slate-200 dark:border-slate-700"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-950/80 text-[#006194] dark:text-cyan-300 font-bold text-xs flex items-center justify-center border border-sky-200 dark:border-sky-800">
+              <div className="w-7 h-7 rounded-full bg-sky-100 dark:bg-sky-950/80 text-[#006194] dark:text-cyan-300 font-bold text-[11px] flex items-center justify-center border border-sky-200 dark:border-sky-800">
                 {node.initials || 'U'}
               </div>
             )}
             <div>
-              <p className="font-bold text-slate-900 dark:text-white text-xs">{node.author}</p>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{node.authorRole}</p>
+              <p className="font-bold text-slate-900 dark:text-white text-[11px]">{node.author}</p>
+              <p className="text-[9px] text-slate-500 dark:text-slate-400 font-medium">{node.authorRole}</p>
             </div>
           </div>
         </div>
 
         {/* Comment Body */}
-        <div className="pl-10">
+        <div className="pl-9">
           {isDeleted ? (
-            <p className="text-xs text-slate-400 dark:text-slate-500 italic">
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
               [Komentar telah dihapus]
             </p>
           ) : (
-            <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-line">
+            <p className="text-[11px] sm:text-xs text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-line">
               {node.content}
             </p>
           )}
@@ -219,19 +219,19 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
 
         {/* Action Controls (Reply, Pin, Delete) */}
         {!isDeleted && (
-          <div className="flex items-center justify-end gap-1 pt-1 text-[11px]">
+          <div className="flex items-center justify-end gap-1 pt-0.5 text-[10px]">
             {/* Inline Reply Trigger */}
             <button
               type="button"
               onClick={() => onToggleReply(node.id, node.author)}
-              className={`p-1.5 rounded-lg transition-all flex items-center justify-center ${
+              className={`p-1 rounded-lg transition-all flex items-center justify-center ${
                 isReplyingThis
                   ? 'bg-sky-100 dark:bg-slate-700 text-[#006194] dark:text-cyan-400 font-bold'
                   : 'text-slate-500 dark:text-slate-400 hover:text-[#006194] dark:hover:text-cyan-400 hover:bg-slate-200/70 dark:hover:bg-slate-700/60'
               }`}
               title="Balas Diskusi (Inline)"
             >
-              <span className="material-symbols-outlined text-[18px]">reply</span>
+              <span className="material-symbols-outlined text-[16px]">reply</span>
             </button>
 
             {/* Pin / Unpin Toggle */}
@@ -239,14 +239,14 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <button
                 type="button"
                 onClick={() => onTogglePin(activeTopicId, node.id)}
-                className={`p-1.5 rounded-lg transition-all flex items-center justify-center ${
+                className={`p-1 rounded-lg transition-all flex items-center justify-center ${
                   node.isPinned
                     ? 'text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 hover:bg-amber-200 dark:hover:bg-amber-900/80'
                     : 'text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40'
                 }`}
                 title={node.isPinned ? 'Lepas Sematan' : 'Sematkan Pesan'}
               >
-                <span className="material-symbols-outlined text-[18px]">push_pin</span>
+                <span className="material-symbols-outlined text-[16px]">push_pin</span>
               </button>
             )}
 
@@ -255,10 +255,10 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <button
                 type="button"
                 onClick={() => onDeleteComment(activeTopicId, node.id)}
-                className="p-1.5 text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-all flex items-center justify-center"
+                className="p-1 text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-all flex items-center justify-center"
                 title="Hapus Balasan"
               >
-                <span className="material-symbols-outlined text-[18px]">delete</span>
+                <span className="material-symbols-outlined text-[16px]">delete</span>
               </button>
             )}
           </div>
@@ -267,10 +267,10 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
 
       {/* Inline Reply Form */}
       {isReplyingThis && (
-        <div className="ml-4 sm:ml-6 mt-2 p-3 bg-sky-50/70 dark:bg-slate-800/80 border border-sky-200 dark:border-slate-700 rounded-xl space-y-2 animate-in fade-in duration-150">
-          <div className="flex items-center justify-between text-xs text-[#006194] dark:text-cyan-400 font-bold">
+        <div className="ml-4 sm:ml-6 mt-2 p-2.5 bg-sky-50/70 dark:bg-slate-800/80 border border-sky-200 dark:border-slate-700 rounded-xl space-y-2 animate-in fade-in duration-150">
+          <div className="flex items-center justify-between text-[11px] text-[#006194] dark:text-cyan-400 font-bold">
             <span className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-sm">reply</span>
+              <span className="material-symbols-outlined text-xs">reply</span>
               <span>Membalas @{node.author}</span>
             </span>
             <button
@@ -286,14 +286,14 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
             onChange={(e) => onChangeInlineText(e.target.value)}
             placeholder={`Tulis balasan Anda untuk @${node.author}...`}
             rows={2}
-            className="w-full p-2.5 text-xs text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-1 focus:ring-[#006194] dark:focus:ring-cyan-400 resize-none"
+            className="w-full p-2 text-xs text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-1 focus:ring-[#006194] dark:focus:ring-cyan-400 resize-none"
             autoFocus
           />
           <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={onCancelReply}
-              className="px-3 py-1.5 text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-700 rounded-lg text-xs font-semibold"
+              className="px-3 py-1 text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-700 rounded-lg text-[11px] font-semibold"
             >
               Batal
             </button>
@@ -301,7 +301,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               type="button"
               onClick={() => onSubmitInlineReply(node.id)}
               disabled={!inlineReplyText.trim()}
-              className="px-4 py-1.5 bg-[#006194] text-white rounded-lg text-xs font-bold hover:bg-[#004b73] transition-all disabled:opacity-50"
+              className="px-3.5 py-1 bg-[#006194] text-white rounded-lg text-[11px] font-bold hover:bg-[#004b73] transition-all disabled:opacity-50"
             >
               Kirim Balasan
             </button>
@@ -464,14 +464,18 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
   } | null>(null);
 
   const triggerReplyPopup = (targetAuthor: string, senderName: string, fullMessage: string) => {
-    setReplyNotificationPopup({
-      targetAuthor,
-      senderName,
-      message: fullMessage
-    });
-    setTimeout(() => {
-      setReplyNotificationPopup(null);
-    }, 8000);
+    // Only show popup alert IF the logged-in user IS the recipient of the reply (targetAuthor)!
+    // If the logged-in user is the sender, do not popup to themselves.
+    if (targetAuthor.toLowerCase() === currentUserName.toLowerCase()) {
+      setReplyNotificationPopup({
+        targetAuthor,
+        senderName,
+        message: fullMessage
+      });
+      setTimeout(() => {
+        setReplyNotificationPopup(null);
+      }, 8000);
+    }
   };
 
   const triggerToast = (msg: string) => {
@@ -503,6 +507,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
       const targetAuthor = parentCandidate ? parentCandidate.author : taggedName;
 
       finalMainContent = formatCleanTaggedMessage(rawMainText, targetAuthor);
+      triggerToast(`Tanggapan Anda telah dikirim ke @${targetAuthor}.`);
       triggerReplyPopup(targetAuthor, currentUserName, finalMainContent);
     } else {
       triggerToast('Tanggapan Anda telah dipublikasikan.');
@@ -554,7 +559,10 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
 
     onAddComment(activeTopic.id, newReply);
 
-    // Trigger instant Popup Notification alert
+    // Toast notification for the sender
+    triggerToast(`Balasan Anda berhasil dikirim ke @${targetAuthor}.`);
+
+    // Popup notification target check (will trigger for targetAuthor recipient)
     triggerReplyPopup(targetAuthor, currentUserName, formattedText);
 
     setInlineReplyText('');
