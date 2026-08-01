@@ -427,6 +427,36 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
 
   const activeTopic = topics.find((t) => t.id === selectedTopicId) || filteredTopics[0] || topics[0];
 
+// Helper: Cleanly format tagged messages to ensure single @TargetAuthor at front without duplicated author name words
+const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string => {
+  let body = rawText.trim();
+  if (!targetAuthor) return body;
+
+  // 1. Strip exact `@Target Author Name` at start (case-insensitive)
+  const escapedTarget = targetAuthor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  body = body.replace(new RegExp(`^@${escapedTarget}\\s*`, 'i'), '');
+
+  // 2. Strip single-word `@FirstName` at start
+  body = body.replace(/^@[^\s:]+\s*/, '');
+
+  // 3. Strip any orphaned author name words at start (e.g. "Pangestu mantaap" -> "mantaap")
+  const authorWords = targetAuthor.trim().split(/\s+/);
+  if (authorWords.length > 1) {
+    authorWords.forEach((word) => {
+      if (word.length > 1) {
+        const wordPattern = new RegExp(`^${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*`, 'i');
+        body = body.replace(wordPattern, '');
+      }
+    });
+  }
+
+  // 4. Strip any extra @mentions typed anywhere else in the body
+  body = body.replace(/@[^\s:]+\s*/g, '').trim();
+
+  // 5. Return clean single tag `@Target Author Name [body]`
+  return body.length > 0 ? `@${targetAuthor} ${body}` : `@${targetAuthor}`;
+};
+
   const [replyNotificationPopup, setReplyNotificationPopup] = useState<{
     targetAuthor: string;
     senderName: string;
@@ -472,8 +502,7 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
       );
       const targetAuthor = parentCandidate ? parentCandidate.author : taggedName;
 
-      const messageBody = rawMainText.replace(/@[^\s:]+\s*/g, '').trim();
-      finalMainContent = messageBody.length > 0 ? `@${targetAuthor} ${messageBody}` : `@${targetAuthor}`;
+      finalMainContent = formatCleanTaggedMessage(rawMainText, targetAuthor);
       triggerReplyPopup(targetAuthor, currentUserName, finalMainContent);
     } else {
       triggerToast('Tanggapan Anda telah dipublikasikan.');
@@ -509,10 +538,7 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
       .substring(0, 2)
       .toUpperCase();
 
-    // Remove any @tags typed anywhere in text, then prepend clean single `@targetAuthor ` at the very front
-    const rawText = inlineReplyText.trim();
-    const messageBody = rawText.replace(/@[^\s:]+\s*/g, '').trim();
-    const formattedText = messageBody.length > 0 ? `@${targetAuthor} ${messageBody}` : `@${targetAuthor}`;
+    const formattedText = formatCleanTaggedMessage(inlineReplyText, targetAuthor);
 
     const newReply: ForumComment = {
       id: `comment-${Date.now()}`,
