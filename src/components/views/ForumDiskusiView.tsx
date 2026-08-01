@@ -434,25 +434,6 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
               <form onSubmit={handleSendComment} className="pt-4 border-t border-slate-200 space-y-3">
                 <label className="text-xs font-bold text-slate-700 block">Tulis Balasan Diskusi</label>
                 <div className="border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#006194]/20 focus-within:border-[#006194]">
-                  {/* Formatting Toolbar */}
-                  <div className="bg-slate-50 p-2 border-b border-slate-200 flex items-center gap-1 text-slate-500">
-                    <button type="button" className="p-1 hover:bg-slate-200 rounded" title="Bold">
-                      <span className="material-symbols-outlined text-[18px]">format_bold</span>
-                    </button>
-                    <button type="button" className="p-1 hover:bg-slate-200 rounded" title="Italic">
-                      <span className="material-symbols-outlined text-[18px]">format_italic</span>
-                    </button>
-                    <button type="button" className="p-1 hover:bg-slate-200 rounded" title="Link">
-                      <span className="material-symbols-outlined text-[18px]">link</span>
-                    </button>
-                    <button type="button" className="p-1 hover:bg-slate-200 rounded" title="Code">
-                      <span className="material-symbols-outlined text-[18px]">code</span>
-                    </button>
-                    <button type="button" className="p-1 hover:bg-slate-200 rounded" title="Attach">
-                      <span className="material-symbols-outlined text-[18px]">attach_file</span>
-                    </button>
-                  </div>
-
                   <textarea
                     value={newCommentText}
                     onChange={(e) => setNewCommentText(e.target.value)}
