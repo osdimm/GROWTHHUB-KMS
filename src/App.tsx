@@ -652,10 +652,10 @@ export default function App() {
       return n.targetUserName.toLowerCase() === currentUser.name.toLowerCase();
     }
 
-    // 2. Division-specific notifications (STRICT DIVISION BOUNDARY: Outside division gets NOTHING)
+    // 2. Division-specific notifications (STRICT DIVISION BOUNDARY: Outside division gets NOTHING, NO Admin bypass)
     if (n.targetDivision) {
       const isSameDivision = currentUser.division && currentUser.division.toLowerCase() === n.targetDivision.toLowerCase();
-      if (!isSameDivision && currentUser.role !== 'Admin') {
+      if (!isSameDivision) {
         return false;
       }
 
@@ -664,14 +664,14 @@ export default function App() {
         return false;
       }
 
-      // Upload verification: ONLY Manager of the SAME division (or Admin)
+      // Upload verification: ONLY Manager of the SAME division
       if (n.targetRoles && n.targetRoles.includes('Manajer')) {
-        return isSameDivision && (currentUser.role === 'Manajer' || currentUser.role === 'Admin');
+        return isSameDivision && currentUser.role === 'Manajer';
       }
 
       // Approved doc notification for division members
       if (n.type === 'approved') {
-        return isSameDivision || currentUser.role === 'Admin';
+        return isSameDivision;
       }
 
       return isSameDivision;
@@ -679,7 +679,7 @@ export default function App() {
 
     // 3. Role-based notification fallback
     if (n.targetRoles && n.targetRoles.length > 0) {
-      return n.targetRoles.includes(currentUser.role) || currentUser.role === 'Admin';
+      return n.targetRoles.includes(currentUser.role);
     }
 
     // 4. Global notifications (system welcome or general announcements for all users)
