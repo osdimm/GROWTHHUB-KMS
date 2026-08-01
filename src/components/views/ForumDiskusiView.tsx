@@ -507,8 +507,14 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
       .substring(0, 2)
       .toUpperCase();
 
-    let formattedText = inlineReplyText.trim();
-    if (!formattedText.startsWith('@')) {
+    let rawText = inlineReplyText.trim();
+    let formattedText = rawText;
+
+    // Clean duplicate leading @mentions to guarantee single @TargetAuthor tag
+    if (formattedText.startsWith('@')) {
+      const bodyWithoutTags = formattedText.replace(/^(?:@[^\s:]+\s*)+/, '').trim();
+      formattedText = `@${targetAuthor} ${bodyWithoutTags}`;
+    } else {
       formattedText = `@${targetAuthor} ${formattedText}`;
     }
 
@@ -820,14 +826,14 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
 
               {/* Main Top-Level Comment Form */}
               <form onSubmit={handleSendMainComment} className="pt-4 border-t border-slate-200 space-y-3">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-200 block">Tulis Balasan Utama</label>
-                <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#006194]/20 focus-within:border-[#006194]">
+                <label className="text-xs font-extrabold text-slate-900 block">Tulis Balasan Utama</label>
+                <div className="border border-slate-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#006194]/20 focus-within:border-[#006194] bg-white">
                   <textarea
                     value={mainCommentText}
                     onChange={(e) => setMainCommentText(e.target.value)}
                     placeholder="Ketik tanggapan Anda untuk topik ini..."
                     rows={3}
-                    className="w-full p-3 text-xs text-slate-800 dark:text-white bg-transparent outline-none resize-none"
+                    className="w-full p-3 text-xs text-slate-900 font-medium placeholder-slate-500 bg-white outline-none resize-none"
                     required
                   />
                 </div>
@@ -985,17 +991,8 @@ export const ForumDiskusiView: React.FC<ForumDiskusiViewProps> = ({
             <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
               <strong className="text-slate-900 dark:text-white">{replyNotificationPopup.senderName}</strong> membalas komentar <strong className="text-[#006194] dark:text-sky-400">{replyNotificationPopup.targetAuthor}</strong>:
             </p>
-            <div className="p-3 bg-sky-50/90 dark:bg-slate-800/90 border border-sky-200/80 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed shadow-sm">
-              {replyNotificationPopup.message.startsWith('@') ? (
-                replyNotificationPopup.message
-              ) : (
-                <>
-                  <span className="font-bold text-[#006194] dark:text-sky-300">
-                    @{replyNotificationPopup.targetAuthor}
-                  </span>{' '}
-                  {replyNotificationPopup.message}
-                </>
-              )}
+            <div className="p-3 bg-sky-50/90 border border-sky-200/80 rounded-xl text-xs font-bold text-slate-900 whitespace-pre-line leading-relaxed shadow-sm">
+              {replyNotificationPopup.message}
             </div>
           </div>
         </div>
