@@ -166,24 +166,18 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <img
                 src={node.avatar}
                 alt={node.author}
-                className={`${
-                  depth > 0 ? 'w-6 h-6' : 'w-7 h-7'
-                } rounded-full object-cover border border-slate-200 dark:border-slate-700 shrink-0`}
+                className="w-6 h-6 rounded-full object-cover border border-slate-200 dark:border-slate-700 shrink-0"
               />
             ) : (
-              <div
-                className={`${
-                  depth > 0 ? 'w-6 h-6 text-[10px]' : 'w-7 h-7 text-[11px]'
-                } rounded-full bg-sky-100 dark:bg-sky-950/80 text-[#006194] dark:text-cyan-300 font-bold flex items-center justify-center border border-sky-200 dark:border-sky-800 shrink-0`}
-              >
+              <div className="w-6 h-6 rounded-full bg-sky-100 dark:bg-sky-950/80 text-[#006194] dark:text-cyan-300 font-bold text-[10px] flex items-center justify-center border border-sky-200 dark:border-sky-800 shrink-0">
                 {node.initials || 'U'}
               </div>
             )}
-            <div className="flex items-baseline gap-1.5 min-w-0 truncate">
+            <div className="flex items-baseline gap-1 min-w-0 truncate">
               <span className="font-bold text-slate-900 dark:text-white text-[11px] truncate">
                 {node.author}
               </span>
-              <span className="text-[9px] text-slate-500 dark:text-slate-400 font-medium truncate">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">
                 • {node.authorRole}
               </span>
             </div>
@@ -191,8 +185,8 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
 
           <div className="flex items-center gap-1.5 shrink-0">
             {node.isPinned && (
-              <span className="flex items-center gap-0.5 text-[9px] font-extrabold text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 px-1 py-0.2 rounded">
-                <span className="material-symbols-outlined text-[11px]">push_pin</span>
+              <span className="flex items-center gap-0.5 text-[9px] font-extrabold text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 px-1.5 py-0.5 rounded">
+                <span className="material-symbols-outlined text-[10px]">push_pin</span>
                 <span>Disematkan</span>
               </span>
             )}
@@ -200,10 +194,10 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <button
                 type="button"
                 onClick={() => onToggleCollapse(node.id)}
-                className="text-[9px] font-bold text-slate-600 dark:text-slate-300 hover:text-[#006194] dark:hover:text-cyan-400 bg-slate-200/70 dark:bg-slate-700/70 px-1.5 py-0.2 rounded transition-colors flex items-center gap-0.5"
+                className="text-[10px] font-bold text-slate-600 dark:text-slate-300 hover:text-[#006194] dark:hover:text-cyan-400 bg-slate-200/70 dark:bg-slate-700/70 px-1.5 py-0.5 rounded transition-colors flex items-center gap-0.5"
                 title={isCollapsed ? 'Tampilkan Balasan' : 'Sembunyikan Balasan'}
               >
-                <span className="material-symbols-outlined text-[11px]">
+                <span className="material-symbols-outlined text-[10px]">
                   {isCollapsed ? 'add' : 'remove'}
                 </span>
                 <span>{isCollapsed ? `+${node.children.length}` : 'Collapse'}</span>
@@ -216,13 +210,13 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
         </div>
 
         {/* Comment Body Content */}
-        <div className={depth > 0 ? 'pl-8' : 'pl-9'}>
+        <div className="pl-8">
           {isDeleted ? (
             <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
               [Komentar telah dihapus]
             </p>
           ) : (
-            <p className="text-[11px] sm:text-xs text-slate-800 dark:text-slate-200 leading-normal whitespace-pre-line">
+            <p className="text-xs text-slate-800 dark:text-slate-200 leading-snug whitespace-pre-line">
               {node.content}
             </p>
           )}
@@ -235,7 +229,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
             <button
               type="button"
               onClick={() => onToggleReply(node.id, node.author)}
-              className={`p-0.5 rounded-md transition-all flex items-center justify-center ${
+              className={`p-1 rounded-md transition-all flex items-center justify-center ${
                 isReplyingThis
                   ? 'bg-sky-100 dark:bg-slate-700 text-[#006194] dark:text-cyan-400 font-bold'
                   : 'text-slate-500 dark:text-slate-400 hover:text-[#006194] dark:hover:text-cyan-400 hover:bg-slate-200/70 dark:hover:bg-slate-700/60'
@@ -250,7 +244,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <button
                 type="button"
                 onClick={() => onTogglePin(activeTopicId, node.id)}
-                className={`p-0.5 rounded-md transition-all flex items-center justify-center ${
+                className={`p-1 rounded-md transition-all flex items-center justify-center ${
                   node.isPinned
                     ? 'text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 hover:bg-amber-200 dark:hover:bg-amber-900/80'
                     : 'text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40'
@@ -266,7 +260,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <button
                 type="button"
                 onClick={() => onDeleteComment(activeTopicId, node.id)}
-                className="p-0.5 text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-md transition-all flex items-center justify-center"
+                className="p-1 text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-md transition-all flex items-center justify-center"
                 title="Hapus Balasan"
               >
                 <span className="material-symbols-outlined text-[15px]">delete</span>
