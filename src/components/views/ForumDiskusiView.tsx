@@ -229,14 +229,14 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
             <button
               type="button"
               onClick={() => onToggleReply(node.id, node.author)}
-              className={`p-1 rounded-md transition-all flex items-center justify-center ${
+              className={`p-0.5 rounded transition-all flex items-center justify-center ${
                 isReplyingThis
                   ? 'bg-sky-100 dark:bg-slate-700 text-[#006194] dark:text-cyan-400 font-bold'
                   : 'text-slate-500 dark:text-slate-400 hover:text-[#006194] dark:hover:text-cyan-400 hover:bg-slate-200/70 dark:hover:bg-slate-700/60'
               }`}
               title="Balas Diskusi (Inline)"
             >
-              <span className="material-symbols-outlined text-[15px]">reply</span>
+              <span className="material-symbols-outlined text-[12px]">reply</span>
             </button>
 
             {/* Pin / Unpin Toggle */}
@@ -244,14 +244,14 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <button
                 type="button"
                 onClick={() => onTogglePin(activeTopicId, node.id)}
-                className={`p-1 rounded-md transition-all flex items-center justify-center ${
+                className={`p-0.5 rounded transition-all flex items-center justify-center ${
                   node.isPinned
                     ? 'text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 hover:bg-amber-200 dark:hover:bg-amber-900/80'
                     : 'text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40'
                 }`}
                 title={node.isPinned ? 'Lepas Sematan' : 'Sematkan Pesan'}
               >
-                <span className="material-symbols-outlined text-[15px]">push_pin</span>
+                <span className="material-symbols-outlined text-[12px]">push_pin</span>
               </button>
             )}
 
@@ -260,10 +260,10 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <button
                 type="button"
                 onClick={() => onDeleteComment(activeTopicId, node.id)}
-                className="p-1 text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-md transition-all flex items-center justify-center"
+                className="p-0.5 text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition-all flex items-center justify-center"
                 title="Hapus Balasan"
               >
-                <span className="material-symbols-outlined text-[15px]">delete</span>
+                <span className="material-symbols-outlined text-[12px]">delete</span>
               </button>
             )}
           </div>
