@@ -213,7 +213,7 @@ export const Header: React.FC<HeaderProps> = ({
                             </span>
                           </div>
 
-                          <p className="text-xs text-slate-600 leading-relaxed line-clamp-3 mb-3">
+                          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line max-h-60 overflow-y-auto custom-scrollbar pr-1 mb-3">
                             {n.desc}
                           </p>
                         </div>
