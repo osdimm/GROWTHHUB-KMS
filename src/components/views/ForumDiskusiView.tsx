@@ -151,17 +151,17 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
       <div
         className={`p-3.5 sm:p-4 rounded-xl border transition-all space-y-2 ${
           node.isPinned
-            ? 'bg-amber-50 border-amber-300 ring-1 ring-amber-300/50'
+            ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700/60 ring-1 ring-amber-300/50'
             : isDeleted
-            ? 'bg-slate-100/80 border-slate-200'
-            : 'bg-slate-50 border-slate-200'
+            ? 'bg-slate-100/80 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800'
+            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700/80'
         }`}
       >
         {/* Header Badges: Pinned & Collapse Control */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {node.isPinned && (
-              <span className="flex items-center gap-1 text-[11px] font-extrabold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-md">
+              <span className="flex items-center gap-1 text-[11px] font-extrabold text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 px-2 py-0.5 rounded-md">
                 <span className="material-symbols-outlined text-xs">push_pin</span>
                 <span>Disematkan</span>
               </span>
@@ -170,7 +170,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <button
                 type="button"
                 onClick={() => onToggleCollapse(node.id)}
-                className="text-[11px] font-bold text-slate-600 hover:text-[#006194] bg-slate-200/70 px-2 py-0.5 rounded-md transition-colors flex items-center gap-1"
+                className="text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:text-[#006194] dark:hover:text-cyan-400 bg-slate-200/70 dark:bg-slate-700/70 px-2 py-0.5 rounded-md transition-colors flex items-center gap-1"
                 title={isCollapsed ? 'Tampilkan Balasan' : 'Sembunyikan Balasan'}
               >
                 <span className="material-symbols-outlined text-xs">
@@ -180,7 +180,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               </button>
             )}
           </div>
-          <span className="text-[10px] text-slate-400 font-medium">{node.timestamp}</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">{node.timestamp}</span>
         </div>
 
         {/* Comment Author Header */}
@@ -190,16 +190,16 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <img
                 src={node.avatar}
                 alt={node.author}
-                className="w-8 h-8 rounded-full object-cover border border-slate-200"
+                className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-sky-100 text-[#006194] font-bold text-xs flex items-center justify-center border border-sky-200">
+              <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-950/80 text-[#006194] dark:text-cyan-300 font-bold text-xs flex items-center justify-center border border-sky-200 dark:border-sky-800">
                 {node.initials || 'U'}
               </div>
             )}
             <div>
-              <p className="font-bold text-slate-900 text-xs">{node.author}</p>
-              <p className="text-[10px] text-slate-500 font-medium">{node.authorRole}</p>
+              <p className="font-bold text-slate-900 dark:text-white text-xs">{node.author}</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{node.authorRole}</p>
             </div>
           </div>
         </div>
@@ -207,11 +207,11 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
         {/* Comment Body */}
         <div className="pl-10">
           {isDeleted ? (
-            <p className="text-xs text-slate-400 italic">
+            <p className="text-xs text-slate-400 dark:text-slate-500 italic">
               [Komentar telah dihapus]
             </p>
           ) : (
-            <p className="text-xs text-slate-800 leading-relaxed whitespace-pre-line">
+            <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-line">
               {node.content}
             </p>
           )}
@@ -226,8 +226,8 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               onClick={() => onToggleReply(node.id, node.author)}
               className={`p-1.5 rounded-lg transition-all flex items-center justify-center ${
                 isReplyingThis
-                  ? 'bg-sky-100 text-[#006194] font-bold'
-                  : 'text-slate-500 hover:text-[#006194] hover:bg-slate-200/70'
+                  ? 'bg-sky-100 dark:bg-slate-700 text-[#006194] dark:text-cyan-400 font-bold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-[#006194] dark:hover:text-cyan-400 hover:bg-slate-200/70 dark:hover:bg-slate-700/60'
               }`}
               title="Balas Diskusi (Inline)"
             >
@@ -241,8 +241,8 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
                 onClick={() => onTogglePin(activeTopicId, node.id)}
                 className={`p-1.5 rounded-lg transition-all flex items-center justify-center ${
                   node.isPinned
-                    ? 'text-amber-800 bg-amber-100 hover:bg-amber-200'
-                    : 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
+                    ? 'text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 hover:bg-amber-200 dark:hover:bg-amber-900/80'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40'
                 }`}
                 title={node.isPinned ? 'Lepas Sematan' : 'Sematkan Pesan'}
               >
@@ -255,7 +255,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
               <button
                 type="button"
                 onClick={() => onDeleteComment(activeTopicId, node.id)}
-                className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-all flex items-center justify-center"
+                className="p-1.5 text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-all flex items-center justify-center"
                 title="Hapus Balasan"
               >
                 <span className="material-symbols-outlined text-[18px]">delete</span>
@@ -267,8 +267,8 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
 
       {/* Inline Reply Form */}
       {isReplyingThis && (
-        <div className="ml-4 sm:ml-6 mt-2 p-3 bg-sky-50/70 border border-sky-200 rounded-xl space-y-2 animate-in fade-in duration-150">
-          <div className="flex items-center justify-between text-xs text-[#006194] font-bold">
+        <div className="ml-4 sm:ml-6 mt-2 p-3 bg-sky-50/70 dark:bg-slate-800/80 border border-sky-200 dark:border-slate-700 rounded-xl space-y-2 animate-in fade-in duration-150">
+          <div className="flex items-center justify-between text-xs text-[#006194] dark:text-cyan-400 font-bold">
             <span className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-sm">reply</span>
               <span>Membalas @{node.author}</span>
@@ -276,7 +276,7 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
             <button
               type="button"
               onClick={onCancelReply}
-              className="text-slate-400 hover:text-rose-500 text-xs font-semibold"
+              className="text-slate-400 dark:text-slate-500 hover:text-rose-500 dark:hover:text-rose-400 text-xs font-semibold"
             >
               Batal
             </button>
@@ -286,14 +286,14 @@ const CommentNodeItem: React.FC<CommentNodeItemProps> = ({
             onChange={(e) => onChangeInlineText(e.target.value)}
             placeholder={`Tulis balasan Anda untuk @${node.author}...`}
             rows={2}
-            className="w-full p-2.5 text-xs text-slate-800 bg-white border border-slate-200 rounded-lg outline-none focus:ring-1 focus:ring-[#006194] resize-none"
+            className="w-full p-2.5 text-xs text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-1 focus:ring-[#006194] dark:focus:ring-cyan-400 resize-none"
             autoFocus
           />
           <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={onCancelReply}
-              className="px-3 py-1.5 text-slate-600 hover:bg-slate-200/60 rounded-lg text-xs font-semibold"
+              className="px-3 py-1.5 text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-700 rounded-lg text-xs font-semibold"
             >
               Batal
             </button>
@@ -621,8 +621,8 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Forum Diskusi</h2>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Forum Diskusi</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             Wadah kolaborasi, tanya jawab operasional, dan pertukaran ide antar tim.
           </p>
         </div>
@@ -641,7 +641,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
       {/* Main Forum Split Container */}
       <div className="grid grid-cols-12 gap-6 items-start">
         {/* Left Topic List Panel */}
-        <div className="col-span-12 lg:col-span-5 xl:col-span-4 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
+        <div className="col-span-12 lg:col-span-5 xl:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm space-y-4">
           {/* Division Filter Controls */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -652,7 +652,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                 <select
                   value={selectedDivisionFilter}
                   onChange={(e) => setSelectedDivisionFilter(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:ring-1 focus:ring-[#006194] outline-none cursor-pointer"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-1 focus:ring-[#006194] outline-none cursor-pointer"
                 >
                   <option value="Semua Divisi">Semua Divisi</option>
                   {divisionsList.map((d) => (
@@ -667,7 +667,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                 <button
                   type="button"
                   onClick={() => setSelectedDivisionFilter('Semua Divisi')}
-                  className="px-2.5 py-2 bg-rose-50 text-rose-600 rounded-xl text-xs font-bold hover:bg-rose-100 transition-colors flex items-center shrink-0"
+                  className="px-2.5 py-2 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-bold hover:bg-rose-100 transition-colors flex items-center shrink-0"
                   title="Reset Filter Divisi"
                 >
                   <span className="material-symbols-outlined text-[16px]">close</span>
@@ -678,7 +678,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
 
           <div className="space-y-2 max-h-[620px] overflow-y-auto custom-scrollbar pr-1">
             {filteredTopics.length === 0 ? (
-              <div className="p-8 text-center text-xs text-slate-400">
+              <div className="p-8 text-center text-xs text-slate-400 dark:text-slate-500">
                 Tidak ada diskusi ditemukan.
               </div>
             ) : (
@@ -690,34 +690,58 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                     onClick={() => setSelectedTopicId(topic.id)}
                     className={`p-4 rounded-xl border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-sky-50 dark:bg-slate-800 border-[#006194] dark:border-cyan-400 shadow-sm'
-                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                        ? 'bg-sky-50 dark:bg-slate-800 border-2 border-[#006194] dark:border-cyan-400 shadow-sm'
+                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span
                         className={`text-[10px] font-extrabold px-2 py-0.5 rounded ${
                           isSelected
-                            ? 'bg-[#006194] text-white dark:bg-cyan-950 dark:text-cyan-300 dark:border dark:border-cyan-800'
+                            ? 'bg-sky-100 text-[#006194] dark:bg-cyan-950 dark:text-cyan-300 dark:border dark:border-cyan-800'
                             : 'bg-sky-100 text-[#006194] dark:bg-slate-800 dark:text-cyan-400 dark:border dark:border-slate-700'
                         }`}
                       >
                         {topic.category}
                       </span>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                      <span
+                        className={`text-[10px] font-medium ${
+                          isSelected
+                            ? 'text-slate-700 dark:text-slate-300'
+                            : 'text-slate-500 dark:text-slate-400'
+                        }`}
+                      >
                         {topic.date}
                       </span>
                     </div>
 
-                    <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm line-clamp-2 leading-snug">
+                    <h4
+                      className={`font-bold text-sm line-clamp-2 leading-snug ${
+                        isSelected
+                          ? 'text-slate-900 dark:text-white'
+                          : 'text-slate-900 dark:text-slate-100'
+                      }`}
+                    >
                       {topic.title}
                     </h4>
 
                     <div className="mt-3 flex items-center justify-between text-xs">
-                      <span className="font-semibold text-slate-600 dark:text-slate-400 truncate max-w-[140px]">
+                      <span
+                        className={`font-semibold truncate max-w-[140px] ${
+                          isSelected
+                            ? 'text-slate-700 dark:text-slate-300'
+                            : 'text-slate-600 dark:text-slate-400'
+                        }`}
+                      >
                         {topic.author}
                       </span>
-                      <span className="flex items-center gap-1 font-bold text-[#006194] dark:text-cyan-400">
+                      <span
+                        className={`flex items-center gap-1 font-bold ${
+                          isSelected
+                            ? 'text-[#006194] dark:text-cyan-400'
+                            : 'text-[#006194] dark:text-cyan-400'
+                        }`}
+                      >
                         <span className="material-symbols-outlined text-[16px]">chat_bubble</span>
                         <span>{topic.comments ? topic.comments.length : 0} Balasan</span>
                       </span>
@@ -730,27 +754,27 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
         </div>
 
         {/* Right Active Topic Thread Panel */}
-        <div className="col-span-12 lg:col-span-7 xl:col-span-8 bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+        <div className="col-span-12 lg:col-span-7 xl:col-span-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden flex flex-col">
           {activeTopic ? (
             <div className="p-6 space-y-6">
               {/* Post Header */}
-              <div className="border-b border-slate-100 pb-6">
+              <div className="border-b border-slate-100 dark:border-slate-800 pb-6">
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="px-3 py-1 bg-sky-100 text-[#006194] text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-2xs">
+                    <span className="px-3 py-1 bg-sky-100 dark:bg-sky-950/80 text-[#006194] dark:text-sky-300 text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-2xs">
                       <span className="material-symbols-outlined text-[16px]">corporate_fare</span>
                       <span>Divisi Topik: {activeTopic.category}</span>
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-slate-400 font-medium">
+                    <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">
                       {activeTopic.date} • {activeTopic.time}
                     </span>
                     {currentUserRole === 'Admin' && onDeleteTopic && (
                       <button
                         type="button"
                         onClick={() => setDeleteConfirmTopic(activeTopic)}
-                        className="px-2.5 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold hover:bg-rose-100 hover:border-rose-300 transition-all flex items-center gap-1 shadow-sm"
+                        className="px-2.5 py-1 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg text-xs font-bold hover:bg-rose-100 transition-all flex items-center gap-1 shadow-sm"
                         title="Hapus Topik Diskusi (Khusus Admin)"
                       >
                         <span className="material-symbols-outlined text-[16px]">delete</span>
@@ -760,12 +784,12 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                   </div>
                 </div>
 
-                <h3 className="text-xl font-bold text-slate-900 leading-snug mb-4">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-snug mb-4">
                   {activeTopic.title}
                 </h3>
 
                 {/* Author Info */}
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
                   {activeTopic.authorAvatar ? (
                     <img
                       src={activeTopic.authorAvatar}
@@ -778,14 +802,14 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                     </div>
                   )}
                   <div>
-                    <p className="font-bold text-slate-900 text-sm">{activeTopic.author}</p>
-                    <p className="text-xs text-slate-500">{activeTopic.authorRole}</p>
+                    <p className="font-bold text-slate-900 dark:text-white text-sm">{activeTopic.author}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{activeTopic.authorRole}</p>
                   </div>
                 </div>
               </div>
 
               {/* Post Content */}
-              <div className="prose prose-slate max-w-none text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+              <div className="prose prose-slate dark:prose-invert max-w-none text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
                 {activeTopic.content}
               </div>
 
@@ -795,7 +819,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                   {activeTopic.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2.5 py-1 bg-slate-100 text-slate-600 text-[11px] font-semibold rounded-md border border-slate-200/60"
+                      className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[11px] font-semibold rounded-md border border-slate-200/60 dark:border-slate-700"
                     >
                       #{tag}
                     </span>
@@ -855,15 +879,15 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
               </div>
 
               {/* Main Top-Level Comment Form */}
-              <form onSubmit={handleSendMainComment} className="pt-4 border-t border-slate-200 space-y-3">
-                <label className="text-xs font-extrabold text-slate-900 block">Tulis Balasan Utama</label>
-                <div className="border border-slate-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#006194]/20 focus-within:border-[#006194] bg-white">
+              <form onSubmit={handleSendMainComment} className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                <label className="text-xs font-extrabold text-slate-900 dark:text-white block">Tulis Balasan Utama</label>
+                <div className="border border-slate-300 dark:border-slate-700 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#006194]/20 dark:focus-within:ring-cyan-500/20 focus-within:border-[#006194] dark:focus-within:border-cyan-400 bg-white dark:bg-slate-900">
                   <textarea
                     value={mainCommentText}
                     onChange={(e) => setMainCommentText(e.target.value)}
                     placeholder="Ketik tanggapan Anda untuk topik ini..."
                     rows={3}
-                    className="w-full p-3 text-xs text-slate-900 font-medium placeholder-slate-500 bg-white outline-none resize-none"
+                    className="w-full p-3 text-xs text-slate-900 dark:text-slate-100 font-medium placeholder-slate-500 dark:placeholder-slate-400 bg-white dark:bg-slate-900 outline-none resize-none"
                     required
                   />
                 </div>
@@ -890,12 +914,12 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
       {/* New Topic Modal */}
       {showNewTopicModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 p-6">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6">
             <div className="flex justify-between items-center mb-5">
-              <h3 className="text-lg font-bold text-slate-900">Buat Topik Diskusi Baru</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Buat Topik Diskusi Baru</h3>
               <button
                 onClick={() => setShowNewTopicModal(false)}
-                className="text-slate-400 hover:text-slate-600"
+                className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
               >
                 <span className="material-symbols-outlined">close</span>
               </button>
@@ -903,7 +927,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
 
             <form onSubmit={handleCreateTopicSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-slate-600 uppercase block mb-1">
+                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase block mb-1">
                   Judul Topik
                 </label>
                 <input
@@ -911,19 +935,19 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                   value={newTopicTitle}
                   onChange={(e) => setNewTopicTitle(e.target.value)}
                   placeholder="Contoh: Evaluasi Alur Kerja Editorial Q1"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-1 focus:ring-[#006194]"
                   required
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-600 uppercase block mb-1">
+                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase block mb-1">
                   Kategori Divisi
                 </label>
                 <select
                   value={newTopicCategory}
                   onChange={(e) => setNewTopicCategory(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:ring-1 focus:ring-[#006194]"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 outline-none focus:ring-1 focus:ring-[#006194]"
                 >
                   {divisionsList.map((d) => (
                     <option key={d} value={d}>
@@ -934,7 +958,7 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-600 uppercase block mb-1">
+                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase block mb-1">
                   Isi Pertanyaan / Topik
                 </label>
                 <textarea
@@ -942,12 +966,12 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
                   onChange={(e) => setNewTopicContent(e.target.value)}
                   placeholder="Jelaskan secara mendalam poin diskusi atau kendala yang dihadapi..."
                   rows={4}
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs"
+                  className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-1 focus:ring-[#006194] resize-none"
                   required
                 />
               </div>
 
-              <div className="flex justify-end pt-4 border-t border-slate-100">
+              <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="submit"
                   className="px-5 py-2 rounded-xl text-xs font-bold bg-[#006194] text-white hover:bg-[#004b73]"
@@ -963,27 +987,27 @@ const formatCleanTaggedMessage = (rawText: string, targetAuthor: string): string
       {/* Delete Topic Modal (Admin) */}
       {deleteConfirmTopic && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 p-6 space-y-4">
-            <div className="flex items-center gap-3 text-rose-600">
-              <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center shrink-0">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
+            <div className="flex items-center gap-3 text-rose-600 dark:text-rose-400">
+              <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 flex items-center justify-center shrink-0">
                 <span className="material-symbols-outlined text-xl">delete_forever</span>
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">Hapus Topik Diskusi</h3>
-                <p className="text-xs text-slate-500">Akses Khusus Admin</p>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Hapus Topik Diskusi</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Akses Khusus Admin</p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Apakah Anda yakin ingin menghapus topik diskusi <strong className="text-slate-900">"{deleteConfirmTopic.title}"</strong>?
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              Apakah Anda yakin ingin menghapus topik diskusi <strong className="text-slate-900 dark:text-white">"{deleteConfirmTopic.title}"</strong>?
               Seluruh balasan dan histori di dalamnya akan terhapus secara permanen dari sistem KMS.
             </p>
 
-            <div className="flex justify-end gap-2.5 pt-3 border-t border-slate-100">
+            <div className="flex justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setDeleteConfirmTopic(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
                 Batal
               </button>
