@@ -92,9 +92,13 @@ export default function App() {
   });
   const [showForcePasswordModal, setShowForcePasswordModal] = useState<boolean>(true);
 
-  // Theme Mode State (light | dark | system)
+  // Theme Mode State (default to 'light' mode)
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     const saved = localStorage.getItem('kms_theme');
+    if (!saved) {
+      localStorage.setItem('kms_theme', 'light');
+      return 'light';
+    }
     return (saved as ThemeMode) || 'light';
   });
 
