@@ -7,7 +7,8 @@ import {
   ForumTopic,
   ForumComment,
   ActivityLog,
-  PendingDoc
+  PendingDoc,
+  AppNotification
 } from '../types';
 
 // ================= SUPABASE STORAGE FILE UPLOAD =================
@@ -492,4 +493,64 @@ export const saveActivityToSupabase = async (activity: ActivityLog) => {
     throw error;
   }
   return data;
+};
+
+// ================= NOTIFICATIONS =================
+export const getNotificationsFromSupabase = async (): Promise<AppNotification[] | null> => {
+  const { data, error } = await supabase
+    .from('notifications')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(200);
+
+  if (error || !data) {
+    if (error) console.error('Error fetching notifications from Supabase:', error.message);
+    return null;
+  }
+
+  return data.map((n) => ({
+    id: n.id,
+    title: n.title,
+    desc: n.description,
+    time: n.time || 'Baru saja',
+    createdAt: n.created_at,
+    author: n.author || '',
+    targetUserId: n.target_user_id || undefined,
+    targetUserName: n.target_user_name || undefined,
+    targetDivision: n.target_division || undefined,
+    targetRoles: n.target_roles || undefined,
+    excludeUploaderName: n.exclude_uploader_name || undefined,
+    type: n.type || 'info',
+    read: n.read || false
+  }));
+};
+
+export const saveNotificationToSupabase = async (notif: AppNotification) => {
+  const { data, error } = await supabase.from('notifications').upsert({
+    id: notif.id,
+    title: notif.title,
+    description: notif.desc,
+    time: notif.time,
+    created_at: notif.createdAt || Date.now(),
+    author: notif.author,
+    target_user_id: notif.targetUserId || null,
+    target_user_name: notif.targetUserName || null,
+    target_division: notif.targetDivision || null,
+    target_roles: notif.targetRoles || null,
+    exclude_uploader_name: notif.excludeUploaderName || null,
+    type: notif.type,
+    read: notif.read || false
+  }).select();
+
+  if (error) {
+    console.error('Error saving notification to Supabase:', error.message);
+  }
+  return data;
+};
+
+export const deleteNotificationFromSupabase = async (id: string) => {
+  const { error } = await supabase.from('notifications').delete().eq('id', id);
+  if (error) {
+    console.error('Error deleting notification from Supabase:', error.message);
+  }
 };

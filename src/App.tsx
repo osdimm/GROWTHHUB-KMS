@@ -47,7 +47,10 @@ import {
   getPendingDocsFromSupabase,
   savePendingDocToSupabase,
   getActivitiesFromSupabase,
-  saveActivityToSupabase
+  saveActivityToSupabase,
+  getNotificationsFromSupabase,
+  saveNotificationToSupabase,
+  deleteNotificationFromSupabase
 } from './services/supabaseService';
 
 import { Sidebar } from './components/Sidebar';
@@ -207,7 +210,8 @@ export default function App() {
           dbHandovers,
           dbTopics,
           dbPending,
-          dbActivities
+          dbActivities,
+          dbNotifications
         ] = await Promise.all([
           getProfilesFromSupabase(),
           getCategoriesFromSupabase(),
@@ -215,7 +219,8 @@ export default function App() {
           getHandoverDocsFromSupabase(),
           getForumTopicsFromSupabase(),
           getPendingDocsFromSupabase(),
-          getActivitiesFromSupabase()
+          getActivitiesFromSupabase(),
+          getNotificationsFromSupabase()
         ]);
 
         if (dbUsers && dbUsers.length > 0) setUsers(dbUsers);
@@ -262,6 +267,7 @@ export default function App() {
         if (dbTopics || []) setForumTopics(dbTopics || []);
         if (dbPending || []) setPendingDocs(dbPending || []);
         if (dbActivities || []) setActivities(dbActivities || []);
+        if (dbNotifications !== null && dbNotifications.length > 0) setNotifications(dbNotifications);
       } catch (err) {
         console.error('Failed to sync with Supabase on mount:', err);
       } finally {
@@ -341,6 +347,9 @@ export default function App() {
         }
         return [replyNotifItem, ...prev];
       });
+      saveNotificationToSupabase(replyNotifItem).catch((err) =>
+        console.error('Gagal simpan notifikasi balasan ke Supabase:', err)
+      );
       return;
     }
 
@@ -380,6 +389,9 @@ export default function App() {
         }
         return [replyNotifItem, ...prev];
       });
+      saveNotificationToSupabase(replyNotifItem).catch((err) =>
+        console.error('Gagal simpan notifikasi balasan ke Supabase:', err)
+      );
 
       // Auto-dismiss after 6 seconds
       setTimeout(() => {
@@ -398,7 +410,7 @@ export default function App() {
     setReplyNotificationPopup(null);
   };
 
-  // Supabase Real-time Subscription for Forum Topics & Comments (Live Updates Lintas Session!)
+  // Supabase Real-time Subscription for Forum Topics, Comments & Notifications (Live Updates Lintas Session!)
   useEffect(() => {
     const handleRealtimeUpdate = async (insertedComment?: any) => {
       try {
@@ -431,8 +443,19 @@ export default function App() {
       }
     };
 
+    const handleRealtimeNotifs = async () => {
+      try {
+        const latestNotifs = await getNotificationsFromSupabase();
+        if (latestNotifs && latestNotifs.length > 0) {
+          setNotifications(latestNotifs);
+        }
+      } catch (e) {
+        console.warn('Realtime notifications fetch warning:', e);
+      }
+    };
+
     const forumChannel = supabase
-      .channel('public_realtime_forum')
+      .channel('public_realtime_app')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'forum_topics' },
@@ -460,6 +483,13 @@ export default function App() {
         { event: 'DELETE', schema: 'public', table: 'forum_comments' },
         () => {
           handleRealtimeUpdate();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'notifications' },
+        () => {
+          handleRealtimeNotifs();
         }
       )
       .subscribe();
@@ -503,6 +533,12 @@ export default function App() {
     };
 
     setNotifications((prev) => [managerNotif, uploaderConfirmNotif, ...prev]);
+    saveNotificationToSupabase(managerNotif).catch((err) =>
+      console.error('Gagal simpan notifikasi manajer ke Supabase:', err)
+    );
+    saveNotificationToSupabase(uploaderConfirmNotif).catch((err) =>
+      console.error('Gagal simpan notifikasi uploader ke Supabase:', err)
+    );
   };
 
   const handleApproveDoc = (docId: string, note?: string) => {
@@ -584,6 +620,12 @@ export default function App() {
     };
 
     setNotifications((prev) => [uploaderApprovedNotif, allUsersNotif, ...prev]);
+    saveNotificationToSupabase(uploaderApprovedNotif).catch((err) =>
+      console.error('Gagal simpan notifikasi approval uploader ke Supabase:', err)
+    );
+    saveNotificationToSupabase(allUsersNotif).catch((err) =>
+      console.error('Gagal simpan notifikasi broadcast approval ke Supabase:', err)
+    );
   };
 
   const handleRejectDoc = (docId: string, note?: string) => {
@@ -611,6 +653,9 @@ export default function App() {
     };
 
     setNotifications((prev) => [uploaderRejectionNotif, ...prev]);
+    saveNotificationToSupabase(uploaderRejectionNotif).catch((err) =>
+      console.error('Gagal simpan notifikasi rejection ke Supabase:', err)
+    );
   };
 
   // Get active currentUser
@@ -682,11 +727,25 @@ export default function App() {
 
   const handleClearNotifications = () => {
     const userNotifIds = new Set(userNotifications.map((u) => u.id));
-    setNotifications((prev) => prev.map((n) => userNotifIds.has(n.id) ? { ...n, read: true } : n));
+    setNotifications((prev) =>
+      prev.map((n) => {
+        if (userNotifIds.has(n.id)) {
+          const updated = { ...n, read: true };
+          saveNotificationToSupabase(updated).catch((err) =>
+            console.error('Gagal update status read notifikasi ke Supabase:', err)
+          );
+          return updated;
+        }
+        return n;
+      })
+    );
   };
 
   const handleDeleteNotification = (notifId: string) => {
     setNotifications((prev) => prev.filter((n) => n.id !== notifId));
+    deleteNotificationFromSupabase(notifId).catch((err) =>
+      console.error('Gagal hapus notifikasi dari Supabase:', err)
+    );
   };
 
   const handleUpdateCurrentUser = (updated: Partial<User>) => {
@@ -870,6 +929,9 @@ export default function App() {
     };
 
     setNotifications((prev) => [forumNotif, ...prev]);
+    saveNotificationToSupabase(forumNotif).catch((err) =>
+      console.error('Gagal simpan notifikasi forum ke Supabase:', err)
+    );
   };
 
   const handleDeleteTopic = (topicId: string) => {
