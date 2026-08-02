@@ -100,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="fixed top-0 right-0 left-0 lg:left-[280px] h-[64px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-40 flex items-center justify-between px-4 lg:px-8">
-      {/* Left: Mobile Toggle & Search */}
+      {/* 1. Search Bar (Paling Kiri) */}
       <div className="flex items-center gap-3 flex-1 max-w-xl sm:max-w-2xl">
         <button
           onClick={onOpenMobileSidebar}
@@ -124,14 +124,14 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Right Controls */}
-      <div className="flex items-center gap-3">
-        {/* Invisible Easter Egg Theme Dropdown Button (Left of Notifications) */}
-        <div className="relative flex items-center" ref={themeRef}>
+      {/* Right Controls Container */}
+      <div className="flex items-center gap-3 shrink-0">
+        {/* 2. Tombol Toggle Tema (Easter Egg Tersembunyi - Di TENGAH antara Search Bar & Notifikasi) */}
+        <div className="relative flex items-center shrink-0" ref={themeRef}>
           <button
             type="button"
             onClick={() => setShowThemeMenu(!showThemeMenu)}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-900 border-0 outline-none cursor-pointer focus-visible:ring-1 focus-visible:ring-slate-300 dark:focus-visible:ring-slate-700 transition-none select-none"
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-900 border-0 outline-none cursor-pointer focus-visible:ring-1 focus-visible:ring-slate-300 dark:focus-visible:ring-slate-700 transition-none select-none shrink-0"
             aria-label="Toggle Theme Easter Egg"
           >
             <span className="material-symbols-outlined text-[18px] text-white dark:text-slate-900 opacity-0 select-none pointer-events-none">
@@ -193,8 +193,8 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Notifications Button & Dropdown (Right of Theme Button) */}
-        <div className="relative" ref={notifRef}>
+        {/* 3. Ikon Lonceng Notifikasi */}
+        <div className="relative shrink-0" ref={notifRef}>
           <button
             onClick={() => {
               setShowNotifications(!showNotifications);
@@ -316,16 +316,18 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        <div className="h-7 w-px bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block"></div>
+        <div className="h-7 w-px bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block shrink-0"></div>
 
-        {/* User Profile Info (Static Display) */}
-        <div className="flex items-center gap-3 p-1.5" ref={profileRef}>
+        {/* User Profile Container (4. Nama User + Badge Role, 5. Avatar User Paling Kanan) */}
+        <div className="flex items-center gap-3 p-1.5 shrink-0" ref={profileRef}>
+          {/* 4. Nama User + Badge Role */}
           <div className="text-right hidden sm:block">
             <p className="text-sm font-bold text-slate-800 dark:text-white leading-tight">{currentUser?.name || 'Dandi Pangestu'}</p>
             <p className="text-[10px] font-extrabold text-[#006194] dark:text-cyan-300 uppercase tracking-wider bg-sky-50 dark:bg-cyan-950/80 px-2 py-0.5 rounded border border-sky-200 dark:border-cyan-800 inline-block">
               {currentUser?.role || 'Admin'}
             </p>
           </div>
+          {/* 5. Avatar User (Paling Kanan) */}
           <div className="relative shrink-0">
             {currentUser?.avatar ? (
               <img
