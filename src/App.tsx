@@ -570,21 +570,20 @@ export default function App() {
       read: false
     };
 
-    // Notification 2: FOR ALL OTHER MEMBERS IN THE SAME DIVISION (Study/view recommendation)
-    const divisionMemberNotif: AppNotification = {
-      id: `notif-app-div-${Date.now()}`,
-      title: `📚 Dokumen Baru di Divisi ${targetDoc.category}`,
-      desc: `Ada dokumen baru "${targetDoc.title}" yang diunggah oleh ${targetDoc.author} di divisi ${targetDoc.category}. Silakan lihat dan pelajari dokumen ini.`,
+    // Notification 2: COMPANY-WIDE Knowledge Base Notification for ALL OTHER USERS (excluding uploader)
+    const allUsersNotif: AppNotification = {
+      id: `notif-app-all-${Date.now()}`,
+      title: '📚 Dokumen Baru di Knowledge Base',
+      desc: `Ada dokumen baru "${targetDoc.title}" yang diunggah oleh ${targetDoc.author}. Silakan lihat dan pelajari dokumen ini.`,
       time: 'Baru saja',
       createdAt: Date.now(),
       author: targetDoc.author,
-      targetDivision: targetDoc.category,
       excludeUploaderName: targetDoc.author,
       type: 'approved',
       read: false
     };
 
-    setNotifications((prev) => [uploaderApprovedNotif, divisionMemberNotif, ...prev]);
+    setNotifications((prev) => [uploaderApprovedNotif, allUsersNotif, ...prev]);
   };
 
   const handleRejectDoc = (docId: string, note?: string) => {
@@ -667,12 +666,17 @@ export default function App() {
       return isSameDivision;
     }
 
-    // 3. Role-based notification fallback
+    // 3. Exclude specific uploader check for company-wide broadcast notifications (e.g. Knowledge Base approval notice to all other users)
+    if (n.excludeUploaderName && n.excludeUploaderName.toLowerCase() === currentUser.name.toLowerCase()) {
+      return false;
+    }
+
+    // 4. Role-based notification fallback
     if (n.targetRoles && n.targetRoles.length > 0) {
       return n.targetRoles.includes(currentUser.role);
     }
 
-    // 4. Global notifications (system welcome or general announcements for all users)
+    // 5. Global / Broadcast notifications (system welcome or general announcements for all users)
     return true;
   });
 

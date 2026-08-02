@@ -139,7 +139,15 @@ describe('3. Critical Security & Privacy Unit Tests: userNotifications Filter Lo
         return isSameDivision;
       }
 
-      // 4. Role fallback
+      // 4. Exclude specific uploader check for company-wide broadcast notifications (without targetDivision)
+      if (
+        n.excludeUploaderName &&
+        n.excludeUploaderName.toLowerCase() === currentUser.name.toLowerCase()
+      ) {
+        return false;
+      }
+
+      // 5. Role fallback
       if (n.targetRoles && n.targetRoles.length > 0) {
         return n.targetRoles.includes(currentUser.role);
       }
@@ -242,7 +250,7 @@ describe('3. Critical Security & Privacy Unit Tests: userNotifications Filter Lo
     expect(filterNotifications(notifs, userKaryawanDiv2)).toHaveLength(0);
   });
 
-  it('should deliver approval notice to uploader and study notice to fellow division members, but EXCLUDE uploader from study notice', () => {
+  it('should deliver approval notice to uploader and COMPANY-WIDE notice to all other users across all divisions, excluding uploader', () => {
     const uploaderApprovalNotif: AppNotification = {
       id: 'notif-app-up-1',
       title: '✅ Pengajuan Dokumen Disetujui',
@@ -253,30 +261,36 @@ describe('3. Critical Security & Privacy Unit Tests: userNotifications Filter Lo
       type: 'approved'
     };
 
-    const divisionStudyNotif: AppNotification = {
-      id: 'notif-app-div-1',
-      title: '📚 Dokumen Baru di Divisi Graphic Design',
-      desc: 'Silakan pelajari dokumen baru',
+    const companyWideKbNotif: AppNotification = {
+      id: 'notif-app-all-1',
+      title: '📚 Dokumen Baru di Knowledge Base',
+      desc: 'Ada dokumen baru yang diunggah oleh Ananda Reva',
       time: 'Baru saja',
       createdAt: Date.now(),
-      targetDivision: 'Graphic Design',
       excludeUploaderName: 'Ananda Reva',
       type: 'approved'
     };
 
-    const notifs = [uploaderApprovalNotif, divisionStudyNotif];
+    const notifs = [uploaderApprovalNotif, companyWideKbNotif];
 
-    // Uploader (Ananda Reva) should receive ONLY the personal approval notice (1 notif)
+    // 1. Uploader (Ananda Reva) receives ONLY personal approval confirmation (1 notif)
     const uploaderNotifs = filterNotifications(notifs, userKaryawanDiv1);
     expect(uploaderNotifs).toHaveLength(1);
     expect(uploaderNotifs[0].id).toBe('notif-app-up-1');
 
-    // Fellow Manager in Graphic Design should receive ONLY the division study notice (1 notif)
+    // 2. Fellow Manager in Graphic Design receives ONLY the company-wide KB notice (1 notif)
     const fellowNotifs = filterNotifications(notifs, userManagerDiv1);
     expect(fellowNotifs).toHaveLength(1);
-    expect(fellowNotifs[0].id).toBe('notif-app-div-1');
+    expect(fellowNotifs[0].id).toBe('notif-app-all-1');
 
-    // User outside division should receive 0 notifications
-    expect(filterNotifications(notifs, userKaryawanDiv2)).toHaveLength(0);
+    // 3. User in ANOTHER division (Talent Development) ALSO receives the company-wide KB notice (1 notif)
+    const outsideUserNotifs = filterNotifications(notifs, userKaryawanDiv2);
+    expect(outsideUserNotifs).toHaveLength(1);
+    expect(outsideUserNotifs[0].id).toBe('notif-app-all-1');
+
+    // 4. Admin in another division ALSO receives the company-wide KB notice (1 notif)
+    const adminNotifs = filterNotifications(notifs, userAdminOutsideDiv);
+    expect(adminNotifs).toHaveLength(1);
+    expect(adminNotifs[0].id).toBe('notif-app-all-1');
   });
 });
