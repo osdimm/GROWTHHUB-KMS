@@ -499,6 +499,59 @@ export default function App() {
     };
   }, [currentUserId, users]);
 
+  // Supabase Real-time Subscription for Knowledge Articles, Handover Docs & Pending Docs (Live Updates Lintas Session!)
+  useEffect(() => {
+    const dataChannel = supabase
+      .channel('public_realtime_kms_data')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'knowledge_articles' },
+        async () => {
+          try {
+            const latest = await getArticlesFromSupabase();
+            if (latest !== null) {
+              setArticles(latest);
+            }
+          } catch (e) {
+            console.warn('Realtime articles fetch warning:', e);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'handover_docs' },
+        async () => {
+          try {
+            const latest = await getHandoverDocsFromSupabase();
+            if (latest !== null) {
+              setHandoverDocs(latest);
+            }
+          } catch (e) {
+            console.warn('Realtime handover docs fetch warning:', e);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'pending_docs' },
+        async () => {
+          try {
+            const latest = await getPendingDocsFromSupabase();
+            if (latest !== null) {
+              setPendingDocs(latest);
+            }
+          } catch (e) {
+            console.warn('Realtime pending docs fetch warning:', e);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(dataChannel);
+    };
+  }, []);
+
 
   // Verification & Notification Handlers
   const handleRequestVerification = (newDoc: PendingDoc) => {
