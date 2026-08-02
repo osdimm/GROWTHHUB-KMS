@@ -573,8 +573,8 @@ export default function App() {
     // Notification 2: COMPANY-WIDE Knowledge Base Notification for ALL OTHER USERS (excluding uploader)
     const allUsersNotif: AppNotification = {
       id: `notif-app-all-${Date.now()}`,
-      title: '📚 Dokumen Baru di Knowledge Base',
-      desc: `Ada dokumen baru "${targetDoc.title}" yang diunggah oleh ${targetDoc.author}. Silakan lihat dan pelajari dokumen ini.`,
+      title: '📚 Ada File Knowledge Base Baru',
+      desc: `Dokumen "${targetDoc.title}" yang diunggah oleh ${targetDoc.author} telah disetujui dan kini tersedia di Knowledge Base. Silakan lihat dan pelajari dokumen ini.`,
       time: 'Baru saja',
       createdAt: Date.now(),
       author: targetDoc.author,
