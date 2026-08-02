@@ -75,7 +75,7 @@ export const getProfilesFromSupabase = async (): Promise<User[] | null> => {
 };
 
 export const saveProfileToSupabase = async (user: User) => {
-  const { error } = await supabase.from('profiles').upsert({
+  const { data, error } = await supabase.from('profiles').upsert({
     id: user.id,
     name: user.name,
     email: user.email,
@@ -87,16 +87,23 @@ export const saveProfileToSupabase = async (user: User) => {
     avatar: user.avatar,
     password: user.password,
     must_change_password: user.mustChangePassword
-  });
+  }).select();
 
   if (error) {
-    console.error('Error saving profile to Supabase:', error.message);
+    console.error('Gagal simpan profil ke Supabase:', error);
+    alert(`❌ GAGAL simpan profil ke database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
+    throw error;
   }
+  return data;
 };
 
 export const deleteProfileFromSupabase = async (id: string) => {
   const { error } = await supabase.from('profiles').delete().eq('id', id);
-  if (error) console.error('Error deleting profile from Supabase:', error.message);
+  if (error) {
+    console.error('Gagal hapus profil dari Supabase:', error);
+    alert(`❌ GAGAL hapus profil dari database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
+    throw error;
+  }
 };
 
 // ================= CATEGORIES =================
@@ -114,21 +121,30 @@ export const getCategoriesFromSupabase = async (): Promise<CategoryItem[] | null
 };
 
 export const saveCategoryToSupabase = async (category: CategoryItem) => {
-  const { error } = await supabase.from('categories').upsert({
+  const { data, error } = await supabase.from('categories').upsert({
     id: category.id,
     code: category.code,
     name: category.name,
     description: category.description,
     content_count: category.contentCount,
     icon: category.icon
-  });
+  }).select();
 
-  if (error) console.error('Error saving category to Supabase:', error.message);
+  if (error) {
+    console.error('Gagal simpan kategori ke Supabase:', error);
+    alert(`❌ GAGAL simpan kategori ke database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
+    throw error;
+  }
+  return data;
 };
 
 export const deleteCategoryFromSupabase = async (id: string) => {
   const { error } = await supabase.from('categories').delete().eq('id', id);
-  if (error) console.error('Error deleting category from Supabase:', error.message);
+  if (error) {
+    console.error('Gagal hapus kategori dari Supabase:', error);
+    alert(`❌ GAGAL hapus kategori dari database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
+    throw error;
+  }
 };
 
 // ================= KNOWLEDGE ARTICLES =================
@@ -153,7 +169,7 @@ export const getArticlesFromSupabase = async (): Promise<KnowledgeArticle[] | nu
 };
 
 export const saveArticleToSupabase = async (article: KnowledgeArticle) => {
-  const { error } = await supabase.from('knowledge_articles').upsert({
+  const { data, error } = await supabase.from('knowledge_articles').upsert({
     id: article.id,
     title: article.title,
     category: article.category,
@@ -167,16 +183,23 @@ export const saveArticleToSupabase = async (article: KnowledgeArticle) => {
     content_type: article.contentType,
     link_url: article.linkUrl,
     file_url: article.fileUrl
-  });
+  }).select();
 
   if (error) {
-    console.error('Error saving article to Supabase:', error.message);
+    console.error('Gagal simpan artikel ke Supabase:', error);
+    alert(`❌ GAGAL simpan artikel ke database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
+    throw error;
   }
+  return data;
 };
 
 export const deleteArticleFromSupabase = async (id: string) => {
   const { error } = await supabase.from('knowledge_articles').delete().eq('id', id);
-  if (error) console.error('Error deleting article from Supabase:', error.message);
+  if (error) {
+    console.error('Gagal hapus artikel dari Supabase:', error);
+    alert(`❌ GAGAL hapus artikel dari database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
+    throw error;
+  }
 };
 
 // ================= HANDOVER DOCS =================
@@ -203,7 +226,7 @@ export const getHandoverDocsFromSupabase = async (): Promise<HandoverDoc[] | nul
 };
 
 export const saveHandoverDocToSupabase = async (doc: HandoverDoc) => {
-  const { error } = await supabase.from('handover_docs').upsert({
+  const { data, error } = await supabase.from('handover_docs').upsert({
     id: doc.id,
     title: doc.title,
     file_type: doc.fileType,
@@ -219,14 +242,23 @@ export const saveHandoverDocToSupabase = async (doc: HandoverDoc) => {
     file_url: doc.fileUrl,
     views: doc.views || 0,
     downloads: doc.downloads || 0
-  });
+  }).select();
 
-  if (error) console.error('Error saving handover doc to Supabase:', error.message);
+  if (error) {
+    console.error('Gagal simpan handover doc ke Supabase:', error);
+    alert(`❌ GAGAL simpan handover doc ke database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
+    throw error;
+  }
+  return data;
 };
 
 export const deleteHandoverDocFromSupabase = async (id: string) => {
   const { error } = await supabase.from('handover_docs').delete().eq('id', id);
-  if (error) console.error('Error deleting handover doc from Supabase:', error.message);
+  if (error) {
+    console.error('Gagal hapus handover doc dari Supabase:', error);
+    alert(`❌ GAGAL hapus handover doc dari database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
+    throw error;
+  }
 };
 
 // ================= FORUM TOPICS =================
@@ -262,7 +294,7 @@ export const getForumTopicsFromSupabase = async (): Promise<ForumTopic[] | null>
 };
 
 export const saveForumTopicToSupabase = async (topic: ForumTopic) => {
-  const { error } = await supabase.from('forum_topics').upsert({
+  const { data, error } = await supabase.from('forum_topics').upsert({
     id: topic.id,
     title: topic.title,
     category: topic.category,
@@ -276,9 +308,14 @@ export const saveForumTopicToSupabase = async (topic: ForumTopic) => {
     comment_count: topic.commentCount,
     content: topic.content,
     tags: topic.tags
-  });
+  }).select();
 
-  if (error) console.error('Error saving forum topic to Supabase:', error.message);
+  if (error) {
+    console.error('Gagal simpan forum topic ke Supabase:', error);
+    alert(`❌ GAGAL simpan forum topic ke database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
+    throw error;
+  }
+  return data;
 };
 
 export const saveForumCommentToSupabase = async (topicId: string, comment: ForumComment) => {
@@ -295,7 +332,7 @@ export const saveForumCommentToSupabase = async (topicId: string, comment: Forum
     parent_id: comment.parentId || null
   };
 
-  let { error } = await supabase.from('forum_comments').upsert(payload);
+  let { data, error } = await supabase.from('forum_comments').upsert(payload).select();
 
   if (error) {
     console.warn('Upsert with parent_id/is_pinned failed, retrying basic fields:', error.message);
@@ -309,21 +346,33 @@ export const saveForumCommentToSupabase = async (topicId: string, comment: Forum
       content: comment.content,
       timestamp: comment.timestamp
     };
-    const retry = await supabase.from('forum_comments').upsert(fallbackPayload);
+    const retry = await supabase.from('forum_comments').upsert(fallbackPayload).select();
     if (retry.error) {
-      console.error('Error saving forum comment to Supabase:', retry.error.message);
+      console.error('Gagal simpan forum comment ke Supabase:', retry.error);
+      alert(`❌ GAGAL simpan komentar forum ke database Supabase:\n[Code: ${retry.error.code || 'UNKNOWN'}] ${retry.error.message}`);
+      throw retry.error;
     }
+    return retry.data;
   }
+  return data;
 };
 
 export const deleteForumTopicFromSupabase = async (id: string) => {
   const { error } = await supabase.from('forum_topics').delete().eq('id', id);
-  if (error) console.error('Error deleting forum topic from Supabase:', error.message);
+  if (error) {
+    console.error('Gagal hapus forum topic dari Supabase:', error);
+    alert(`❌ GAGAL hapus topik forum dari database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
+    throw error;
+  }
 };
 
 export const deleteForumCommentFromSupabase = async (commentId: string) => {
   const { error } = await supabase.from('forum_comments').delete().eq('id', commentId);
-  if (error) console.error('Error deleting forum comment from Supabase:', error.message);
+  if (error) {
+    console.error('Gagal hapus forum comment dari Supabase:', error);
+    alert(`❌ GAGAL hapus komentar forum dari database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
+    throw error;
+  }
 };
 
 // ================= PENDING DOCS =================
@@ -349,7 +398,7 @@ export const getPendingDocsFromSupabase = async (): Promise<PendingDoc[] | null>
 };
 
 export const savePendingDocToSupabase = async (doc: PendingDoc) => {
-  const { error } = await supabase.from('pending_docs').upsert({
+  const { data, error } = await supabase.from('pending_docs').upsert({
     id: doc.id,
     title: doc.title,
     category: doc.category,
@@ -364,9 +413,14 @@ export const savePendingDocToSupabase = async (doc: PendingDoc) => {
     status: doc.status,
     note: doc.note,
     file_url: doc.fileUrl
-  });
+  }).select();
 
-  if (error) console.error('Error saving pending doc to Supabase:', error.message);
+  if (error) {
+    console.error('Gagal simpan pending doc ke Supabase:', error);
+    alert(`❌ GAGAL simpan pending doc ke database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
+    throw error;
+  }
+  return data;
 };
 
 // ================= ACTIVITIES =================
@@ -386,7 +440,7 @@ export const getActivitiesFromSupabase = async (): Promise<ActivityLog[] | null>
 };
 
 export const saveActivityToSupabase = async (activity: ActivityLog) => {
-  const { error } = await supabase.from('activity_logs').upsert({
+  const { data, error } = await supabase.from('activity_logs').upsert({
     id: activity.id,
     user_name: activity.user,
     user_initials: activity.userInitials,
@@ -395,7 +449,12 @@ export const saveActivityToSupabase = async (activity: ActivityLog) => {
     action: activity.action,
     time_ago: activity.timeAgo,
     status: activity.status
-  });
+  }).select();
 
-  if (error) console.error('Error saving activity to Supabase:', error.message);
+  if (error) {
+    console.error('Gagal simpan activity ke Supabase:', error);
+    alert(`❌ GAGAL simpan log aktivitas ke database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
+    throw error;
+  }
+  return data;
 };
