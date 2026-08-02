@@ -249,18 +249,17 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Single Dynamic Theme Dropdown Button (Hidden visually, backend logic intact) */}
-        <div className="hidden relative" ref={themeRef}>
+        {/* Invisible Easter Egg Theme Dropdown Button */}
+        <div className="relative flex items-center" ref={themeRef}>
           <button
             type="button"
             onClick={() => setShowThemeMenu(!showThemeMenu)}
-            className="p-2 text-slate-600 dark:text-slate-300 hover:text-[#006194] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all flex items-center gap-0.5 border border-slate-200 dark:border-slate-700"
-            title={`Mode Tampilan: ${themeMode === 'light' ? 'Light' : themeMode === 'dark' ? 'Dark' : 'System'}`}
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-900 border-0 outline-none cursor-pointer focus-visible:ring-1 focus-visible:ring-slate-300 dark:focus-visible:ring-slate-700 transition-none select-none"
+            aria-label="Toggle Theme Easter Egg"
           >
-            <span className="material-symbols-outlined text-[20px] text-amber-500">
+            <span className="material-symbols-outlined text-[18px] text-white dark:text-slate-900 opacity-0 select-none pointer-events-none">
               {themeMode === 'light' ? 'light_mode' : themeMode === 'dark' ? 'dark_mode' : 'desktop_windows'}
             </span>
-            <span className="material-symbols-outlined text-[14px] text-slate-400">expand_more</span>
           </button>
 
           {showThemeMenu && (
@@ -275,7 +274,9 @@ export const Header: React.FC<HeaderProps> = ({
                   setShowThemeMenu(false);
                 }}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
-                  themeMode === 'light' ? 'bg-amber-50 text-amber-900 dark:bg-amber-500/20 dark:text-amber-300 border border-amber-200' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  themeMode === 'light'
+                    ? 'bg-amber-50 text-amber-900 dark:bg-amber-500/20 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
                 <span className="material-symbols-outlined text-base text-amber-500">light_mode</span>
@@ -288,7 +289,9 @@ export const Header: React.FC<HeaderProps> = ({
                   setShowThemeMenu(false);
                 }}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
-                  themeMode === 'dark' ? 'bg-indigo-50 text-indigo-900 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  themeMode === 'dark'
+                    ? 'bg-indigo-50 text-indigo-900 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
                 <span className="material-symbols-outlined text-base text-indigo-500">dark_mode</span>
@@ -301,7 +304,9 @@ export const Header: React.FC<HeaderProps> = ({
                   setShowThemeMenu(false);
                 }}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
-                  themeMode === 'system' ? 'bg-sky-50 text-sky-900 dark:bg-sky-500/20 dark:text-sky-300 border border-sky-200' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  themeMode === 'system'
+                    ? 'bg-sky-50 text-sky-900 dark:bg-sky-500/20 dark:text-sky-300 border border-sky-200 dark:border-sky-800'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
                 <span className="material-symbols-outlined text-base text-sky-500">desktop_windows</span>

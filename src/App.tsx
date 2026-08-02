@@ -95,22 +95,53 @@ export default function App() {
   });
   const [showForcePasswordModal, setShowForcePasswordModal] = useState<boolean>(true);
 
-  // Theme Mode State (permanently default to 'light' mode)
-  const [themeMode, setThemeMode] = useState<ThemeMode>('light');
-
-  // One-time cleanup & Light Mode enforcement on mount
-  useEffect(() => {
+  // Theme Mode State (with localStorage persistence & system preference detection)
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     try {
-      localStorage.removeItem('kms_theme');
+      const saved = localStorage.getItem('kms_theme');
+      if (saved === 'light' || saved === 'dark' || saved === 'system') {
+        return saved as ThemeMode;
+      }
     } catch (e) {
       console.error(e);
     }
+    return 'light';
+  });
+
+  // Apply Dark/Light/System theme to document root & body
+  useEffect(() => {
+    try {
+      localStorage.setItem('kms_theme', themeMode);
+    } catch (e) {
+      console.error(e);
+    }
+
     const root = document.documentElement;
     const body = document.body;
-    root.classList.remove('dark');
-    body.classList.remove('dark');
-    root.style.colorScheme = 'light';
-  }, []);
+
+    const applyTheme = (isDark: boolean) => {
+      if (isDark) {
+        root.classList.add('dark');
+        body.classList.add('dark');
+        root.style.colorScheme = 'dark';
+      } else {
+        root.classList.remove('dark');
+        body.classList.remove('dark');
+        root.style.colorScheme = 'light';
+      }
+    };
+
+    if (themeMode === 'system') {
+      const systemQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      applyTheme(systemQuery.matches);
+
+      const handleChange = (e: MediaQueryListEvent) => applyTheme(e.matches);
+      systemQuery.addEventListener('change', handleChange);
+      return () => systemQuery.removeEventListener('change', handleChange);
+    } else {
+      applyTheme(themeMode === 'dark');
+    }
+  }, [themeMode]);
 
   // Save session state to sessionStorage & localStorage
   useEffect(() => {
