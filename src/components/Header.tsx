@@ -126,7 +126,74 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right Controls */}
       <div className="flex items-center gap-3">
-        {/* Notifications Button & Dropdown */}
+        {/* Invisible Easter Egg Theme Dropdown Button (Left of Notifications) */}
+        <div className="relative flex items-center" ref={themeRef}>
+          <button
+            type="button"
+            onClick={() => setShowThemeMenu(!showThemeMenu)}
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-900 border-0 outline-none cursor-pointer focus-visible:ring-1 focus-visible:ring-slate-300 dark:focus-visible:ring-slate-700 transition-none select-none"
+            aria-label="Toggle Theme Easter Egg"
+          >
+            <span className="material-symbols-outlined text-[18px] text-white dark:text-slate-900 opacity-0 select-none pointer-events-none">
+              {themeMode === 'light' ? 'light_mode' : themeMode === 'dark' ? 'dark_mode' : 'desktop_windows'}
+            </span>
+          </button>
+
+          {showThemeMenu && (
+            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-1.5 z-50 animate-in fade-in duration-150 text-xs">
+              <div className="px-2 py-1 text-[10px] font-extrabold uppercase text-slate-400 border-b border-slate-100 dark:border-slate-800 mb-1">
+                Pilihan Mode Tampilan
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (setThemeMode) setThemeMode('light');
+                  setShowThemeMenu(false);
+                }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
+                  themeMode === 'light'
+                    ? 'bg-amber-50 text-amber-900 dark:bg-amber-500/20 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+              >
+                <span className="material-symbols-outlined text-base text-amber-500">light_mode</span>
+                <span>Light (Terang)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (setThemeMode) setThemeMode('dark');
+                  setShowThemeMenu(false);
+                }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
+                  themeMode === 'dark'
+                    ? 'bg-indigo-50 text-indigo-900 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+              >
+                <span className="material-symbols-outlined text-base text-indigo-500">dark_mode</span>
+                <span>Dark (Gelap)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (setThemeMode) setThemeMode('system');
+                  setShowThemeMenu(false);
+                }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
+                  themeMode === 'system'
+                    ? 'bg-sky-50 text-sky-900 dark:bg-sky-500/20 dark:text-sky-300 border border-sky-200 dark:border-sky-800'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+              >
+                <span className="material-symbols-outlined text-base text-sky-500">desktop_windows</span>
+                <span>System (Sistem)</span>
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Notifications Button & Dropdown (Right of Theme Button) */}
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => {
@@ -245,73 +312,6 @@ export const Header: React.FC<HeaderProps> = ({
                   )})}
                 </div>
               )}
-            </div>
-          )}
-        </div>
-
-        {/* Invisible Easter Egg Theme Dropdown Button */}
-        <div className="relative flex items-center" ref={themeRef}>
-          <button
-            type="button"
-            onClick={() => setShowThemeMenu(!showThemeMenu)}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-900 border-0 outline-none cursor-pointer focus-visible:ring-1 focus-visible:ring-slate-300 dark:focus-visible:ring-slate-700 transition-none select-none"
-            aria-label="Toggle Theme Easter Egg"
-          >
-            <span className="material-symbols-outlined text-[18px] text-white dark:text-slate-900 opacity-0 select-none pointer-events-none">
-              {themeMode === 'light' ? 'light_mode' : themeMode === 'dark' ? 'dark_mode' : 'desktop_windows'}
-            </span>
-          </button>
-
-          {showThemeMenu && (
-            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-1.5 z-50 animate-in fade-in duration-150 text-xs">
-              <div className="px-2 py-1 text-[10px] font-extrabold uppercase text-slate-400 border-b border-slate-100 dark:border-slate-800 mb-1">
-                Pilihan Mode Tampilan
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  if (setThemeMode) setThemeMode('light');
-                  setShowThemeMenu(false);
-                }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
-                  themeMode === 'light'
-                    ? 'bg-amber-50 text-amber-900 dark:bg-amber-500/20 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
-                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                }`}
-              >
-                <span className="material-symbols-outlined text-base text-amber-500">light_mode</span>
-                <span>Light (Terang)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (setThemeMode) setThemeMode('dark');
-                  setShowThemeMenu(false);
-                }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
-                  themeMode === 'dark'
-                    ? 'bg-indigo-50 text-indigo-900 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
-                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                }`}
-              >
-                <span className="material-symbols-outlined text-base text-indigo-500">dark_mode</span>
-                <span>Dark (Gelap)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (setThemeMode) setThemeMode('system');
-                  setShowThemeMenu(false);
-                }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition-all ${
-                  themeMode === 'system'
-                    ? 'bg-sky-50 text-sky-900 dark:bg-sky-500/20 dark:text-sky-300 border border-sky-200 dark:border-sky-800'
-                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                }`}
-              >
-                <span className="material-symbols-outlined text-base text-sky-500">desktop_windows</span>
-                <span>System (Sistem)</span>
-              </button>
             </div>
           )}
         </div>
