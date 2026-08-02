@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { supabase } from './lib/supabase';
 import {
   NavigationTab,
@@ -1452,6 +1453,7 @@ export default function App() {
           setActiveTab('login');
         }}
       />
+      <Analytics />
     </div>
   );
 }
