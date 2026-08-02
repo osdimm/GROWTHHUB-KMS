@@ -100,17 +100,18 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="fixed top-0 right-0 left-0 lg:left-[280px] h-[64px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-40 flex items-center justify-between px-4 lg:px-8">
-      {/* 1. Search Bar (Paling Kiri) */}
-      <div className="flex items-center gap-3 flex-1 max-w-xl sm:max-w-2xl">
+      {/* Left Container: Search Bar + Mepet Theme Easter Egg */}
+      <div className="flex items-center flex-1 max-w-xl sm:max-w-2xl">
         <button
           onClick={onOpenMobileSidebar}
-          className="lg:hidden p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"
+          className="lg:hidden p-2 mr-3 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"
           aria-label="Open menu"
         >
           <span className="material-symbols-outlined">menu</span>
         </button>
 
-        <div className="relative w-full">
+        {/* 1. Search Bar (Paling Kiri) */}
+        <div className="relative flex-1">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-[20px]">
             search
           </span>
@@ -122,12 +123,9 @@ export const Header: React.FC<HeaderProps> = ({
             className="w-full pl-10 pr-4 py-2 bg-slate-100/80 dark:bg-slate-800/80 border border-transparent dark:border-slate-700 rounded-full text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-[#006194] dark:focus:border-cyan-400 focus:ring-2 focus:ring-[#006194]/10 transition-all"
           />
         </div>
-      </div>
 
-      {/* Right Controls Container */}
-      <div className="flex items-center gap-3 shrink-0">
-        {/* 2. Tombol Toggle Tema (Easter Egg Tersembunyi - Di TENGAH antara Search Bar & Notifikasi) */}
-        <div className="relative flex items-center shrink-0" ref={themeRef}>
+        {/* 2. Tombol Toggle Tema (Easter Egg Tersembunyi - MEPET/menempel di ujung kanan search bar) */}
+        <div className="relative flex items-center shrink-0 ml-1 sm:ml-1.5" ref={themeRef}>
           <button
             type="button"
             onClick={() => setShowThemeMenu(!showThemeMenu)}
@@ -192,7 +190,10 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           )}
         </div>
+      </div>
 
+      {/* Right Controls Container (Jarak NORMAL ke Notifikasi & Profile) */}
+      <div className="flex items-center gap-3 shrink-0 ml-4 sm:ml-6">
         {/* 3. Ikon Lonceng Notifikasi */}
         <div className="relative shrink-0" ref={notifRef}>
           <button
