@@ -169,7 +169,7 @@ export const getArticlesFromSupabase = async (): Promise<KnowledgeArticle[] | nu
 };
 
 export const saveArticleToSupabase = async (article: KnowledgeArticle) => {
-  const { data, error } = await supabase.from('knowledge_articles').upsert({
+  const fullPayload = {
     id: article.id,
     title: article.title,
     category: article.category,
@@ -179,16 +179,33 @@ export const saveArticleToSupabase = async (article: KnowledgeArticle) => {
     file_type: article.fileType,
     views: article.views || 0,
     downloads: article.downloads || 0,
-    download_url: article.downloadUrl,
-    content_type: article.contentType,
-    link_url: article.linkUrl,
-    file_url: article.fileUrl
-  }).select();
+    download_url: article.downloadUrl || null,
+    content_type: article.contentType || 'file',
+    link_url: article.linkUrl || null,
+    file_url: article.fileUrl || null
+  };
+
+  let { data, error } = await supabase.from('knowledge_articles').upsert(fullPayload).select();
 
   if (error) {
-    console.error('Gagal simpan artikel ke Supabase:', error);
-    alert(`❌ GAGAL simpan artikel ke database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
-    throw error;
+    console.warn('Upsert full article payload failed, retrying core fields:', error.message);
+    const corePayload = {
+      id: article.id,
+      title: article.title,
+      category: article.category,
+      summary: article.summary,
+      author: article.author,
+      date: article.date,
+      file_type: article.fileType,
+      views: article.views || 0
+    };
+    const retry = await supabase.from('knowledge_articles').upsert(corePayload).select();
+    if (retry.error) {
+      console.error('Gagal simpan artikel ke Supabase:', retry.error);
+      alert(`❌ GAGAL simpan artikel ke database Supabase:\n[Code: ${retry.error.code || 'UNKNOWN'}] ${retry.error.message}\n\nSilakan jalankan SQL Script RLS & Schema di Supabase SQL Editor.`);
+      throw retry.error;
+    }
+    return retry.data;
   }
   return data;
 };
@@ -226,7 +243,7 @@ export const getHandoverDocsFromSupabase = async (): Promise<HandoverDoc[] | nul
 };
 
 export const saveHandoverDocToSupabase = async (doc: HandoverDoc) => {
-  const { data, error } = await supabase.from('handover_docs').upsert({
+  const fullPayload = {
     id: doc.id,
     title: doc.title,
     file_type: doc.fileType,
@@ -237,17 +254,35 @@ export const saveHandoverDocToSupabase = async (doc: HandoverDoc) => {
     author: doc.author,
     author_role: doc.authorRole,
     description: doc.description,
-    content_type: doc.contentType,
-    link_url: doc.linkUrl,
-    file_url: doc.fileUrl,
+    content_type: doc.contentType || 'file',
+    link_url: doc.linkUrl || null,
+    file_url: doc.fileUrl || null,
     views: doc.views || 0,
     downloads: doc.downloads || 0
-  }).select();
+  };
+
+  let { data, error } = await supabase.from('handover_docs').upsert(fullPayload).select();
 
   if (error) {
-    console.error('Gagal simpan handover doc ke Supabase:', error);
-    alert(`❌ GAGAL simpan handover doc ke database Supabase:\n[Code: ${error.code || 'UNKNOWN'}] ${error.message}`);
-    throw error;
+    console.warn('Upsert full handover doc payload failed, retrying core fields:', error.message);
+    const corePayload = {
+      id: doc.id,
+      title: doc.title,
+      file_type: doc.fileType,
+      file_size: doc.fileSize,
+      rotation_period: doc.rotationPeriod,
+      division: doc.division,
+      submit_date: doc.submitDate,
+      author: doc.author,
+      description: doc.description
+    };
+    const retry = await supabase.from('handover_docs').upsert(corePayload).select();
+    if (retry.error) {
+      console.error('Gagal simpan handover doc ke Supabase:', retry.error);
+      alert(`❌ GAGAL simpan handover doc ke database Supabase:\n[Code: ${retry.error.code || 'UNKNOWN'}] ${retry.error.message}\n\nSilakan jalankan SQL Script RLS & Schema di Supabase SQL Editor.`);
+      throw retry.error;
+    }
+    return retry.data;
   }
   return data;
 };
