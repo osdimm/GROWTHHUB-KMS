@@ -116,14 +116,12 @@ export const HandoverRotasiView: React.FC<HandoverRotasiViewProps> = ({
   const query = globalSearch.toLowerCase();
 
   const filteredDocs = handoverDocs.filter((doc) => {
-    // Rule 1: Handover Rotasi Visibility by Role Level:
-    // - Admin can see ALL handover docs across all roles.
-    // - Manajer can ONLY see handover docs uploaded by Manajer (or created by themselves).
-    // - Karyawan can ONLY see handover docs uploaded by Karyawan (or created by themselves).
-    // - Associate can ONLY see handover docs uploaded by Associate (or created by themselves).
+    // Rule 1: Handover Rotasi Visibility by Uploader Role (PRIMARY FILTER):
+    // - Admin: can view ALL handover docs across all roles.
+    // - Non-Admin (Manajer, Karyawan, Associate): currentUser CAN ONLY view handover docs whose authorRole matches currentUserRole EXACTLY. Division does NOT grant access!
     if (currentUserRole !== 'Admin') {
-      const docRole = doc.authorRole || (doc.author?.includes('Manajer') ? 'Manajer' : 'Karyawan');
-      if (docRole !== currentUserRole && doc.author !== currentUserName) {
+      const docRole = doc.authorRole || (doc.author?.toLowerCase().includes('manajer') ? 'Manajer' : 'Karyawan');
+      if (docRole !== currentUserRole) {
         return false;
       }
     }
@@ -423,7 +421,9 @@ export const HandoverRotasiView: React.FC<HandoverRotasiViewProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredDocs.length === 0 ? (
           <div className="col-span-full bg-white p-12 rounded-2xl border border-slate-200 text-center text-slate-400">
-            Tidak ada dokumen handover yang sesuai kriteria pencarian.
+            <span className="material-symbols-outlined text-[48px] text-slate-300 block mb-2">folder_off</span>
+            <p className="font-medium text-slate-600">Belum ada dokumen handover yang tersedia untuk role Anda ({currentUserRole}).</p>
+            <p className="text-xs text-slate-400 mt-1">Hak akses dokumen Handover Rotasi dibatasi khusus antar sesama role uploader.</p>
           </div>
         ) : (
           filteredDocs.map((doc) => (

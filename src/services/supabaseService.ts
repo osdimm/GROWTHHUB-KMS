@@ -275,6 +275,7 @@ export const saveHandoverDocToSupabase = async (doc: HandoverDoc) => {
       division: doc.division,
       submit_date: doc.submitDate,
       author: doc.author,
+      author_role: doc.authorRole,
       description: doc.description
     };
     const retry = await supabase.from('handover_docs').upsert(corePayload).select();

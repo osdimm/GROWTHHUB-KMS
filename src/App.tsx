@@ -901,8 +901,12 @@ export default function App() {
 
   // Handover Handlers
   const handleAddHandover = (newDoc: HandoverDoc) => {
-    setHandoverDocs((prev) => [newDoc, ...prev]);
-    saveHandoverDocToSupabase(newDoc).catch(console.error);
+    const docWithRole: HandoverDoc = {
+      ...newDoc,
+      authorRole: newDoc.authorRole || currentUser.role
+    };
+    setHandoverDocs((prev) => [docWithRole, ...prev]);
+    saveHandoverDocToSupabase(docWithRole).catch(console.error);
   };
 
   const handleDeleteHandover = (id: string) => {
